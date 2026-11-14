@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>唐 · 明 · 清 —— 三朝大事时间轴（618—1912）</title>
+<style>
+  :root{
+    --paper:#f3ede1;
+    --paper-2:#fbf7ee;
+    --card:#fffdf8;
+    --ink:#1b1813;
+    --ink-2:#3d3830;
+    --ink-3:#726a5d;
+    --line:rgba(30,27,22,.13);
+    --line-soft:rgba(30,27,22,.07);
+    --tang:#b03a2c;
+    --ming:#255d78;
+    --qing:#4b6b48;
+    --serif:"Source Han Serif SC","Noto Serif CJK SC","Songti SC","STSong","SimSun",Georgia,serif;
+    --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:var(--serif);
+    color:var(--ink);
+    background-color:var(--paper);
+    background-image:
+      radial-gradient(circle at 18% 12%, rgba(255,255,255,.65), transparent 45%),
+      radial-gradient(circle at 82% 78%, rgba(255,255,255,.45), transparent 42%),
+      repeating-linear-gradient(0deg, rgba(30,27,22,.018) 0 1px, transparent 1px 3px);
+    line-height:1.85;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none;}
+
+  /* ---------- 进度条 ---------- */
+  .progress{
+    position:fixed;top:0;left:0;height:2px;width:0;
+    background:linear-gradient(90deg,var(--tang),var(--ming),var(--qing));
+    z-index:90;
+  }
+
+  /* ---------- 首屏 ---------- */
+  .masthead{
+    max-width:1080px;margin:0 auto;padding:76px 28px 8px;
+    text-align:center;
+  }
+  .eyebrow{
+    font-family:var(--sans);font-size:12px;letter-spacing:.42em;
+    color:var(--ink-3);text-transform:uppercase;margin:0 0 26px;
+  }
+  .masthead h1{
+    font-size:clamp(44px,9vw,84px);
+    margin:0;font-weight:600;letter-spacing:.16em;
+    line-height:1.1;text-indent:.16em;
+  }
+  .masthead h1 em{
+    font-style:normal;color:var(--ink-3);font-size:.42em;
+    vertical-align:middle;letter-spacing:.1em;margin:0 .18em;
+  }
+  .rule{
+    display:flex;align-items:center;justify-content:center;gap:14px;
+    margin:30px auto 22px;max-width:520px;
+  }
+  .rule::before,.rule::after{
+    content:"";height:1px;flex:1;
+    background:linear-gradient(90deg,transparent,var(--line),transparent);
+  }
+  .rule i{
+    width:7px;height:7px;transform:rotate(45deg);
+    border:1px solid var(--ink-3);display:block;
+  }
+  .lede{
+    max-width:660px;margin:0 auto;color:var(--ink-2);
+    font-size:16.5px;line-height:2.05;text-align:justify;
+  }
+  .lede strong{color:var(--ink);font-weight:600;}
+
+  /* ---------- 朝代比例带 ---------- */
+  .ribbon-wrap{max-width:1080px;margin:44px auto 0;padding:0 28px;}
+  .ribbon{
+    display:flex;min-width:660px;height:76px;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,.42);
+    font-family:var(--sans);overflow:hidden;
+  }
+  .ribbon-scroll{overflow-x:auto;overflow-y:hidden;padding-bottom:4px;}
+  .band{
+    display:flex;flex-direction:column;justify-content:center;
+    padding:0 12px;position:relative;color:#fff;
+    transition:filter .25s ease;
+  }
+  .band:hover{filter:brightness(1.12);}
+  .band b{font-size:20px;letter-spacing:.34em;font-weight:600;line-height:1.3;}
+  .band span{font-size:10.5px;letter-spacing:.08em;opacity:.82;white-space:nowrap;}
+  .band span i{font-style:normal;}
+  .band.tang{background:linear-gradient(180deg,#bb4638,#a13226);}
+  .band.ming{background:linear-gradient(180deg,#2d6b86,#21536b);}
+  .band.qing{background:linear-gradient(180deg,#587a54,#405d3e);}
+  .gap{
+    display:flex;align-items:center;justify-content:center;
+    font-size:10.5px;letter-spacing:.1em;color:var(--ink-3);
+    background-image:repeating-linear-gradient(135deg,rgba(30,27,22,.07) 0 1px,transparent 1px 7px);
+    padding:0 6px;text-align:center;line-height:1.5;
+  }
+  .ribbon-note{
+    font-family:var(--sans);font-size:11.5px;color:var(--ink-3);
+    letter-spacing:.06em;margin:10px 0 0;text-align:right;
+  }
+
+  /* ---------- 吸顶导航 ---------- */
+  .erabar{
+    position:sticky;top:0;z-index:60;
+    margin-top:56px;
+    background:rgba(243,237,225,.9);
+    backdrop-filter:saturate(160%) blur(10px);
+    -webkit-backdrop-filter:saturate(160%) blur(10px);
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+  .erabar-inner{
+    max-width:1080px;margin:0 auto;padding:0 20px;
+    display:flex;gap:4px;align-items:stretch;
+  }
+  .erabar a{
+    flex:1;padding:14px 6px 12px;text-align:center;
+    font-family:var(--sans);font-size:13px;letter-spacing:.16em;
+    color:var(--ink-3);border-bottom:2px solid transparent;
+    transition:color .2s ease,border-color .2s ease,background .2s ease;
+  }
+  .erabar a b{font-family:var(--serif);font-size:16px;letter-spacing:.2em;display:block;color:var(--ink-2);transition:color .2s;}
+  .erabar a span{font-size:10.5px;letter-spacing:.06em;opacity:.75;white-space:nowrap;}
+  .erabar a:hover{background:rgba(255,255,255,.4);}
+  .erabar a[data-era="tang"].on{color:var(--tang);border-color:var(--tang);}
+  .erabar a[data-era="tang"].on b{color:var(--tang);}
+  .erabar a[data-era="ming"].on{color:var(--ming);border-color:var(--ming);}
+  .erabar a[data-era="ming"].on b{color:var(--ming);}
+  .erabar a[data-era="qing"].on{color:var(--qing);border-color:var(--qing);}
+  .erabar a[data-era="qing"].on b{color:var(--qing);}
+
+  /* ---------- 朝代区块 ---------- */
+  .era{
+    --era:var(--tang);
+    max-width:1080px;margin:0 auto;padding:86px 28px 40px;
+    scroll-margin-top:70px;
+  }
+  .era[data-era="ming"]{--era:var(--ming);}
+  .era[data-era="qing"]{--era:var(--qing);}
+
+  .era-head{position:relative;overflow:hidden;padding-bottom:26px;border-bottom:1px solid var(--line);}
+  .era-head::after{
+    content:attr(data-char);
+    position:absolute;right:-6px;top:-58px;
+    font-size:230px;line-height:1;font-weight:600;
+    color:var(--era);opacity:.07;pointer-events:none;
+  }
+  .era-index{
+    font-family:var(--sans);font-size:11px;letter-spacing:.4em;
+    color:var(--era);margin:0 0 12px;
+  }
+  .era-head h2{
+    margin:0;font-size:clamp(30px,5vw,44px);font-weight:600;
+    letter-spacing:.12em;display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;
+  }
+  .era-head h2 small{
+    font-family:var(--sans);font-size:13px;letter-spacing:.14em;
+    color:var(--ink-3);font-weight:400;
+  }
+  .era-meta{
+    display:flex;flex-wrap:wrap;gap:8px 26px;margin:18px 0 0;
+    font-family:var(--sans);font-size:12.5px;color:var(--ink-2);letter-spacing:.05em;
+  }
+  .era-meta div span{color:var(--ink-3);margin-right:6px;}
+  .era-intro{
+    max-width:720px;margin:18px 0 0;font-size:15.5px;color:var(--ink-2);
+    text-align:justify;line-height:2;
+  }
+  .era-intro b{color:var(--era);font-weight:600;}
+
+  /* ---------- 时间轴 ---------- */
+  .timeline{position:relative;margin-top:52px;}
+  .timeline::before{
+    content:"";position:absolute;left:105px;top:12px;bottom:12px;width:1px;
+    background:linear-gradient(180deg,transparent,var(--era) 6%,var(--era) 94%,transparent);
+    opacity:.45;
+  }
+  .item{
+    position:relative;
+    display:grid;grid-template-columns:92px 1fr;gap:28px;
+    margin-bottom:26px;
+  }
+  .item::before{
+    content:"";position:absolute;left:101px;top:24px;
+    width:8px;height:8px;border-radius:50%;
+    background:var(--paper);border:1.5px solid var(--era);
+    z-index:2;transition:background .25s ease,transform .25s ease;
+  }
+  .item:hover::before{background:var(--era);transform:scale(1.25);}
+
+  .year{
+    text-align:right;padding-top:12px;
+    font-size:18px;letter-spacing:.02em;color:var(--ink-3);
+    font-variant-numeric:tabular-nums;white-space:nowrap;
+  }
+  .year .r{font-size:14px;letter-spacing:0;}
+  .item.key .year{color:var(--era);font-weight:600;}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line-soft);
+    border-left:2px solid var(--era);
+    padding:22px 26px 20px;
+    box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 10px 26px -22px rgba(30,27,22,.6);
+    transition:box-shadow .3s ease,transform .3s ease,border-color .3s ease;
+  }
+  .card:hover{
+    transform:translateY(-2px);
+    box-shadow:0 18px 36px -26px rgba(30,27,22,.55);
+    border-color:rgba(30,27,22,.16);
+  }
+  .card h3{
+    margin:0;font-size:20px;font-weight:600;letter-spacing:.04em;line-height:1.6;
+  }
+  .card h3 .sub{
+    font-family:var(--sans);font-size:12px;color:var(--ink-3);
+    letter-spacing:.06em;margin-left:10px;font-weight:400;
+  }
+  .who{
+    list-style:none;display:flex;flex-wrap:wrap;gap:7px;
+    margin:12px 0 0;padding:0;
+  }
+  .who li{
+    font-family:var(--sans);font-size:11.5px;letter-spacing:.06em;
+    color:var(--era);background:rgba(30,27,22,.035);
+    border:1px solid rgba(30,27,22,.09);
+    padding:2px 9px;border-radius:2px;
+  }
+  .who li::before{content:"◦ ";opacity:.5;}
+
+  .facts{margin:16px 0 0;padding-top:15px;border-top:1px dashed var(--line);}
+  .fact{display:grid;grid-template-columns:3em 1fr;gap:10px;margin-bottom:9px;}
+  .fact:last-child{margin-bottom:0;}
+  .fact .k{
+    font-family:var(--sans);font-size:11px;letter-spacing:.14em;
+    color:var(--era);padding-top:5px;opacity:.95;
+  }
+  .fact p{margin:0;font-size:15.2px;color:var(--ink-2);line-height:1.95;text-align:justify;}
+  .fact p b{color:var(--ink);font-weight:600;}
+
+  /* 小结 */
+  .summary{
+    margin:40px 0 0 120px;padding:20px 24px;
+    background:rgba(255,255,255,.5);
+    border-left:3px double var(--era);
+    font-size:14.5px;color:var(--ink-2);line-height:2;
+  }
+  .summary strong{
+    font-family:var(--sans);font-size:11px;letter-spacing:.28em;
+    color:var(--era);display:block;margin-bottom:6px;
+  }
+
+  /* ---------- 对照 ---------- */
+  .coda{max-width:1080px;margin:0 auto;padding:100px 28px 60px;}
+  .coda h2{
+    font-size:clamp(26px,4vw,34px);font-weight:600;letter-spacing:.12em;
+    margin:0 0 8px;text-align:center;
+  }
+  .coda .sub{
+    text-align:center;font-family:var(--sans);font-size:12px;
+    letter-spacing:.24em;color:var(--ink-3);margin:0 0 44px;
+  }
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);background:rgba(255,255,255,.5);}
+  table{border-collapse:collapse;width:100%;min-width:660px;font-size:13.8px;}
+  th,td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line-soft);vertical-align:top;line-height:1.85;}
+  thead th{
+    font-family:var(--sans);font-size:11.5px;letter-spacing:.16em;
+    color:var(--ink-3);font-weight:500;border-bottom:1px solid var(--line);
+    background:rgba(30,27,22,.025);
+  }
+  thead th.t{color:var(--tang);}
+  thead th.m{color:var(--ming);}
+  thead th.q{color:var(--qing);}
+  tbody th{
+    font-family:var(--sans);font-size:12px;letter-spacing:.14em;
+    color:var(--ink-2);font-weight:500;white-space:nowrap;
+    background:rgba(30,27,22,.015);
+  }
+  tbody tr:last-child th,tbody tr:last-child td{border-bottom:none;}
+  td{color:var(--ink-2);}
+
+  .threads{margin-top:56px;display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));}
+  .thread{
+    background:var(--card);border:1px solid var(--line-soft);padding:24px 24px 22px;
+    border-top:2px solid var(--ink);position:relative;
+  }
+  .thread .n{
+    font-family:var(--sans);font-size:10.5px;letter-spacing:.3em;
+    color:var(--ink-3);display:block;margin-bottom:10px;
+  }
+  .thread h4{margin:0 0 10px;font-size:16.5px;font-weight:600;letter-spacing:.06em;}
+  .thread p{margin:0;font-size:13.8px;color:var(--ink-2);line-height:1.95;text-align:justify;}
+  .thread p b{color:var(--ink);}
+
+  .quote{
+    margin:64px auto 0;max-width:640px;text-align:center;
+    font-size:17px;line-height:2.1;color:var(--ink-2);
+  }
+  .quote::before,.quote::after{
+    content:"";display:block;width:40px;height:1px;background:var(--line);margin:22px auto;
+  }
+  .quote em{font-style:normal;color:var(--ink-3);font-size:13px;display:block;margin-top:14px;letter-spacing:.1em;}
+
+  footer{
+    text-align:center;padding:30px 24px 60px;
+    font-family:var(--sans);font-size:11.5px;color:var(--ink-3);
+    letter-spacing:.06em;line-height:2;
+  }
+
+  /* 入场 */
+  .item{opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.3,1);}
+  .item.in{opacity:1;transform:none;}
+
+  @media (max-width:760px){
+    .ribbon{min-width:0;}
+    .gap{display:none;}
+    .band{padding:0 10px;}
+    .band b{font-size:16px;letter-spacing:.2em;}
+    .band span{font-size:9.5px;letter-spacing:.02em;}
+    .band span i{display:none;}
+    .ribbon-note{display:none;}
+    .erabar a{padding:12px 4px 10px;letter-spacing:.08em;font-size:12px;}
+    .erabar a b{font-size:15px;}
+    .erabar a span{font-size:9.5px;}
+    .masthead{padding-top:52px;}
+    .era{padding:64px 20px 30px;}
+    .timeline::before,.item::before{display:none;}
+    .timeline{margin-top:36px;}
+    .item{grid-template-columns:1fr;gap:8px;margin-bottom:22px;}
+    .year{text-align:left;padding-top:0;font-size:15px;letter-spacing:.14em;}
+    .year span{display:inline-block;border-bottom:2px solid var(--era);padding-bottom:1px;}
+    .card{padding:18px 18px 16px;}
+    .card h3{font-size:17.5px;}
+    .facts{margin-top:14px;}
+    .fact{grid-template-columns:1fr;gap:2px;margin-bottom:12px;}
+    .fact .k{padding-top:0;}
+    .summary{margin-left:0;}
+    .era-head::after{font-size:150px;top:-30px;}
+    .coda{padding:70px 20px 40px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto;}
+    .item{opacity:1;transform:none;transition:none;}
+    .card,.card:hover{transition:none;transform:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<header class="masthead">
+  <p class="eyebrow">年表 · 六一八年 — 一九一二年</p>
+  <h1>唐 <em>·</em> 明 <em>·</em> 清</h1>
+  <div class="rule"><i></i></div>
+  <p class="lede">
+    一千三百年间，中国走过三个由汉人建立的大一统王朝，也走过两段分裂与异族统治的中间地带。
+    这里挑出<strong>三十七件转折性事件</strong>，每一件都标注年份、关键人物、背景、过程与影响——
+    不是罗列年号，而是看清<strong>一件事如何从旧秩序里长出来，又怎样改变了往后几百年的走向</strong>。
+  </p>
+</header>
+
+<div class="ribbon-wrap">
+  <div class="ribbon-scroll">
+    <div class="ribbon">
+      <a class="band tang" href="#tang" style="flex:289 1 0"><b>唐</b><span>618—907<i> · 289年</i></span></a>
+      <span class="gap" style="flex:53 1 0">五代<br>十国</span>
+      <span class="gap" style="flex:408 1 0">宋 · 辽 · 金 · 元<br>（本轴从略）</span>
+      <a class="band ming" href="#ming" style="flex:276 1 0"><b>明</b><span>1368—1644<i> · 276年</i></span></a>
+      <a class="band qing" href="#qing" style="flex:268 1 0"><b>清</b><span>1644—1912<i> · 268年</i></span></a>
+    </div>
+  </div>
+  <p class="ribbon-note">带幅按实际年数比例绘制；虚线为中间期</p>
+</div>
+
+<nav class="erabar" aria-label="朝代跳转">
+  <div class="erabar-inner">
+    <a href="#tang" data-era="tang"><b>唐</b><span>618—907 · 11事</span></a>
+    <a href="#ming" data-era="ming"><b>明</b><span>1368—1644 · 10事</span></a>
+    <a href="#qing" data-era="qing"><b>清</b><span>1644—1912 · 16事</span></a>
+  </div>
+</nav>
+
+<!-- ================= 唐 ================= -->
+<section class="era" id="tang" data-era="tang">
+  <div class="era-head" data-char="唐">
+    <p class="era-index">第 一 段</p>
+    <h2>唐 <small>618 — 907</small></h2>
+    <div class="era-meta">
+      <div><span>建立</span>李渊，受隋禅于长安</div>
+      <div><span>都城</span>长安（东都洛阳）</div>
+      <div><span>极盛</span>贞观至开元，疆域西越葱岭</div>
+      <div><span>制度</span>三省六部 · 科举 · 府兵→募兵</div>
+    </div>
+    <p class="era-intro">
+      唐的底色是<b>开放与流动</b>：门阀未死而科举已开，胡汉杂处而佛法东来，丝路上商旅与使节往来不绝。
+      但它的崩溃也埋在同一套制度里——为守边而设的节度使，最终反过来吞噬了帝国。安史之乱是这条曲线的顶点，也是断点。
+    </p>
+  </div>
+
+  <div class="timeline">
+
+    <article class="item key">
+      <div class="year"><span>618</span></div>
+      <div class="card">
+        <h3>晋阳起兵，李渊建唐<span class="sub">隋亡唐兴</span></h3>
+        <ul class="who"><li>李渊</li><li>李世民</li><li>裴寂</li><li>刘文静</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>隋炀帝三征高句丽、开凿运河、巡幸无度，民力耗尽，天下群雄并起；李渊为太原留守，手握边兵。</p></div>
+          <div class="fact"><span class="k">过程</span><p>617年李渊父子自晋阳起兵南下，十一月克长安，立代王杨侑为帝；618年炀帝在江都被杀，李渊废侑自立，国号<b>唐</b>，改元武德，随后逐一削平薛举、刘武周、王世充、窦建德等割据势力。</p></div>
+          <div class="fact"><span class="k">影响</span><p>结束隋末十余年分裂，重建大一统帝国；关陇集团与山东豪杰合流，奠定唐初政治格局，国祚延续289年。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item">
+      <div class="year"><span>626</span></div>
+      <div class="card">
+        <h3>玄武门之变<span class="sub">储位之争</span></h3>
+        <ul class="who"><li>李世民</li><li>李建成</li><li>李元吉</li><li>尉迟敬德</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>太子李建成居长守正，秦王李世民以军功独大，双方各结党羽；高祖李渊在废立之间久拖不决。</p></div>
+          <div class="fact"><span class="k">过程</span><p>626年六月初四，李世民伏兵宫城北门玄武门，射杀建成、元吉，逼李渊立己为太子、总揽军国；两月后受禅即位，次年改元<b>贞观</b>。</p></div>
+          <div class="fact"><span class="k">影响</span><p>以流血完成权力交接，却换来了贞观年间的稳定；此后唐代储位之争屡以政变收场，也为玄宗朝的继承危机埋下惯例。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item key">
+      <div class="year"><span class="r">627–649</span></div>
+      <div class="card">
+        <h3>贞观之治<span class="sub">治世典范</span></h3>
+        <ul class="who"><li>唐太宗</li><li>魏征</li><li>房玄龄</li><li>杜如晦</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>隋亡不过十余年，君臣亲见“其兴也勃、其亡也忽”，<b>以隋为鉴</b>成为朝堂共识。</p></div>
+          <div class="fact"><span class="k">过程</span><p>轻徭薄赋、劝课农桑、释放宫女、赈济灾民；完善三省六部与政事堂议政，修订《贞观律》，科举增开科目；太宗纳谏，魏征前后陈事二百余条。</p></div>
+          <div class="fact"><span class="k">影响</span><p>户口渐复、米价回落、四夷来附，被后世奉为治世模板；“水能载舟，亦能覆舟”的君道论述，成为中国传统政治的思想资源。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item">
+      <div class="year"><span>630</span></div>
+      <div class="card">
+        <h3>灭东突厥，称天可汗</h3>
+        <ul class="who"><li>李靖</li><li>李勣</li><li>颉利可汗</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>突厥控弦百万，为北疆大患；626年颉利兵临渭水，太宗以疑兵退敌，视为奇耻。</p></div>
+          <div class="fact"><span class="k">过程</span><p>629年冬，李靖、李勣等六路出击；630年春李靖率轻骑夜袭阴山，颉利可汗被擒，东突厥汗国灭亡，余部内迁。</p></div>
+          <div class="fact"><span class="k">影响</span><p>西北诸族共尊太宗为<b>天可汗</b>，唐由守势转为主动经营草原；羁縻府州制度推行，丝路北道畅通，但突厥余众后来复国为后突厥。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item">
+      <div class="year"><span>641</span></div>
+      <div class="card">
+        <h3>文成公主入藏</h3>
+        <ul class="who"><li>文成公主</li><li>松赞干布</li><li>禄东赞</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>松赞干布统一青藏高原、迁都逻些，634年遣使通唐并请婚；唐蕃初次交锋后，双方转向和亲。</p></div>
+          <div class="fact"><span class="k">过程</span><p>641年，江夏王李道宗持节送嫁，公主逾日月山入藏，随行携佛经佛像、医方农书、工匠与谷物种子；松赞干布为建宫室、易服色。</p></div>
+          <div class="fact"><span class="k">影响</span><p>唐蕃结“舅甥之好”，中原历法、医学、工艺与佛教传入吐蕃；此后二百年唐蕃和战交替，和亲与会盟成为处理边疆的基本手段。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item">
+      <div class="year"><span>645</span></div>
+      <div class="card">
+        <h3>玄奘归国译经<span class="sub">西行十七年</span></h3>
+        <ul class="who"><li>玄奘</li><li>唐太宗</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>唐初佛典译本歧异，玄奘于629年私出玉门西行求法，历十七年、游一百一十国，在那烂陀寺从戒贤受学。</p></div>
+          <div class="fact"><span class="k">过程</span><p>645年返长安，太宗迎见于洛阳；玄奘驻大慈恩寺，译经七十五部一千三百余卷，口述《大唐西域记》，创唯识宗。</p></div>
+          <div class="fact"><span class="k">影响</span><p>汉传佛教义学达于高峰；《大唐西域记》成为研究中亚南亚史地的第一手文献，也是后世《西游记》的故事源头。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item key">
+      <div class="year"><span>690</span></div>
+      <div class="card">
+        <h3>武周革命<span class="sub">唯一女皇</span></h3>
+        <ul class="who"><li>武则天</li><li>狄仁杰</li><li>来俊臣</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>655年武则天立为皇后，高宗晚年多病，武后“垂帘听政”，与帝并称“二圣”，朝政实权渐移。</p></div>
+          <div class="fact"><span class="k">过程</span><p>684年起临朝称制、废立中宗睿宗；690年改唐为<b>周</b>，自称圣神皇帝，都洛阳；一面开殿试、设武举、广揽寒门，一面用酷吏、兴告密；705年张柬之发动神龙政变，中宗复位。</p></div>
+          <div class="fact"><span class="k">影响</span><p>中国历史上唯一的女皇帝，沉重打击关陇门阀；科举取士规模扩大，士人上升通道被打开，为开元盛世储备了人才。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item key">
+      <div class="year"><span class="r">713–741</span></div>
+      <div class="card">
+        <h3>开元盛世<span class="sub">极盛之世</span></h3>
+        <ul class="who"><li>唐玄宗</li><li>姚崇</li><li>宋璟</li><li>张说</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>中宗、睿宗两朝宫廷政变频仍；710年唐隆政变后，李隆基铲除太平公主势力，掌握皇权。</p></div>
+          <div class="fact"><span class="k">过程</span><p>任姚崇、宋璟为相，裁汰冗官、括户检田、整顿漕运与币制；改府兵为募兵，设十节度经略使；修《唐六典》，编《大唐开元礼》。</p></div>
+          <div class="fact"><span class="k">影响</span><p>人口约五千万，长安成为百万人口的国际都会，杜甫以“稻米流脂粟米白”记之；然而边镇节度使兼领数道、拥兵自重，盛世之下已伏危机。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item key">
+      <div class="year"><span class="r">755–763</span></div>
+      <div class="card">
+        <h3>安史之乱<span class="sub">由盛转衰的断点</span></h3>
+        <ul class="who"><li>安禄山</li><li>史思明</li><li>郭子仪</li><li>李光弼</li><li>杨国忠</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>节度使集军、政、财权于一身，边兵四十九万而中央禁军虚弱；玄宗晚年怠政，李林甫、杨国忠相继专权，与身兼三镇的安禄山势同水火。</p></div>
+          <div class="fact"><span class="k">过程</span><p>755年十一月安禄山以“清君侧”为名起兵范阳，年底陷洛阳；756年破潼关，玄宗奔蜀，<b>马嵬驿兵变</b>，杨国忠、杨贵妃死；肃宗灵武即位，借回纥兵反攻，757年收复两京；761年史思明被杀，763年史朝义自缢。</p></div>
+          <div class="fact"><span class="k">影响</span><p>八年战乱使户口锐减、北方经济残破，唐由盛转衰；<b>藩镇割据、宦官专权、边地尽失</b>三大痼疾成形；均田制瓦解，赋税转向两税法。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item">
+      <div class="year"><span>780</span></div>
+      <div class="card">
+        <h3>两税法<span class="sub">赋税制度的转折</span></h3>
+        <ul class="who"><li>杨炎</li><li>唐德宗</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>均田制破坏、户口流散，以人丁为本的租庸调制无从征收；战乱后各地苛敛并行，财政失控。</p></div>
+          <div class="fact"><span class="k">过程</span><p>780年采纳杨炎之议：废租庸调，按资产多寡分等定税，户税征钱、地税征粟，分夏、秋两次缴纳，商税三十取一。</p></div>
+          <div class="fact"><span class="k">影响</span><p>征税标准由<b>人丁转向财产</b>，人身控制放松，是中国赋税史的分水岭；但钱重物轻、附加横生，后世屡有“两税之外复有两税”之弊。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item">
+      <div class="year"><span class="r">875–907</span></div>
+      <div class="card">
+        <h3>黄巢起义与唐亡<span class="sub">门阀的终点</span></h3>
+        <ul class="who"><li>黄巢</li><li>朱温</li><li>李克用</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>懿宗、僖宗以来灾荒相继，藩镇盘剥、盐利苛重，关东连年大旱而赋敛不止。</p></div>
+          <div class="fact"><span class="k">过程</span><p>875年王仙芝起于长垣，黄巢响应，流动作战遍及南北；881年攻入长安，建国号“大齐”；884年兵败狼虎谷。降将朱温渐强，907年废哀帝自立，建后梁。</p></div>
+          <div class="fact"><span class="k">影响</span><p>魏晋以来的门阀士族在战火中彻底凋零；唐亡，五代十国开启，中国进入半个世纪的分裂期。</p></div>
+        </div>
+      </div>
+    </article>
+
+  </div>
+
+  <div class="summary">
+    <strong>一 朝 之 变</strong>
+    唐的制度成就（三省六部、科举、律令）被后世全盘继承，它的失败方式（边将坐大、财政失序）也被后世反复警惕。
+    一个王朝最辉煌处往往正是最脆弱处——开元的天宝，只隔了十几年。
+  </div>
+</section>
+
+<!-- ================= 明 ================= -->
+<section class="era" id="ming" data-era="ming">
+  <div class="era-head" data-char="明">
+    <p class="era-index">第 二 段</p>
+    <h2>明 <small>1368 — 1644</small></h2>
+    <div class="era-meta">
+      <div><span>建立</span>朱元璋，北伐逐元于应天</div>
+      <div><span>都城</span>南京 → 北京（1421年迁）</div>
+      <div><span>极盛</span>永乐至仁宣，七下西洋</div>
+      <div><span>制度</span>废丞相 · 内阁 · 卫所 · 一条鞭法</div>
+    </div>
+    <p class="era-intro">
+      明是<b>皇权最刚硬</b>的王朝：丞相被废、功臣被屠、海疆内收，一切权力向皇帝一人收拢。
+      它用极严的制度换来了两百多年的稳定，也用同一套制度堵死了自我调整的余地——当小冰期、财政危机与辽东边患同时到来，这个体系几乎没有缓冲。
+    </p>
+  </div>
+
+  <div class="timeline">
+
+    <article class="item key">
+      <div class="year"><span>1368</span></div>
+      <div class="card">
+        <h3>建明北伐，逐元于漠北<span class="sub">洪武开国</span></h3>
+        <ul class="who"><li>朱元璋</li><li>徐达</li><li>常遇春</li><li>刘基</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>元末黄河屡决、滥发纸钞、民族等级森严，红巾军起于颍州；朱元璋自濠州起兵，据应天，先后吞并陈友谅、张士诚。</p></div>
+          <div class="fact"><span class="k">过程</span><p>1367年发布“驱逐胡虏，恢复中华”檄文，徐达、常遇春率军北伐；1368年正月朱元璋称帝于应天，国号<b>大明</b>，年号洪武；八月克大都，元顺帝北走上都。</p></div>
+          <div class="fact"><span class="k">影响</span><p>重建汉人主导的统一王朝，元廷退居漠北为北元；黄册、鱼鳞图册、里甲与卫所制相继推行，形成一套高度编户化的基层秩序。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item">
+      <div class="year"><span>1380</span></div>
+      <div class="card">
+        <h3>诛胡惟庸，废丞相<span class="sub">皇权独揽</span></h3>
+        <ul class="who"><li>朱元璋</li><li>胡惟庸</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>明初沿元制设中书省，丞相总揽庶政；淮西功臣集团势大，相权与皇权摩擦不断。</p></div>
+          <div class="fact"><span class="k">过程</span><p>1380年以谋反罪诛丞相胡惟庸，株连三万余人；随即罢中书省、废丞相，析权于六部，六部直接对皇帝负责；设锦衣卫侦伺，后立《皇明祖训》严禁复设丞相。</p></div>
+          <div class="fact"><span class="k">影响</span><p>沿袭一千六百年的宰相制度终结，皇权空前集中；皇帝政务负荷剧增，遂有内阁票拟、宦官批红之制，为明代政治埋下新的结构性隐患。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item key">
+      <div class="year"><span class="r">1405–1433</span></div>
+      <div class="card">
+        <h3>郑和七下西洋<span class="sub">海上远航</span></h3>
+        <ul class="who"><li>郑和</li><li>明成祖</li><li>王景弘</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>永乐初年国力恢复、造船与罗盘技术成熟；成祖以“靖难”得位，需宣示正统、招徕贡使，并传有寻觅建文帝之意。</p></div>
+          <div class="fact"><span class="k">过程</span><p>1405年首航，船队两百余艘、随行两万七千余人，自刘家港出发，经占城、满剌加、锡兰，最远抵东非麻林、木骨都束；二十八年间七次远航，前三次以武力肃清航道，后以册封、贸易为主。</p></div>
+          <div class="fact"><span class="k">影响</span><p>朝贡体系与印度洋贸易网络一度以中国为中心；“厚往薄来”耗费巨大，加之海禁政策与北疆压力，远航终止，中国海洋事业由进取转为内收。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item">
+      <div class="year"><span>1421</span></div>
+      <div class="card">
+        <h3>迁都北京<span class="sub">天子守国门</span></h3>
+        <ul class="who"><li>明成祖</li><li>蒯祥</li><li>陈珪</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>北平为燕王旧镇、成祖龙兴之地；蒙古势力退回漠北后，北方防线需要更靠前的指挥中枢。</p></div>
+          <div class="fact"><span class="k">过程</span><p>1406年起营建宫城、皇城与天坛，征调工匠百万、采木于川湖；1421年正月正式迁都，改北平为北京，南京降为留都，形成两京制。</p></div>
+          <div class="fact"><span class="k">影响</span><p>政治中心北移，“天子守国门”强化北防；漕运成为国家命脉，大运河年运粮四百万石；北京由此成为此后五百余年的政治中心。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item key">
+      <div class="year"><span>1449</span></div>
+      <div class="card">
+        <h3>土木堡之变<span class="sub">武勋集团的转折</span></h3>
+        <ul class="who"><li>明英宗</li><li>王振</li><li>也先</li><li>于谦</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>瓦剌统一蒙古诸部，朝贡使团虚报人数以冒赏，贡市摩擦激化；司礼监王振专权，怂恿英宗亲征以立威。</p></div>
+          <div class="fact"><span class="k">过程</span><p>1449年七月仓促出兵二十五万，八月于土木堡被围，全军溃败，英宗被俘，王振死于乱军；也先挟帝叩关，于谦拥立郕王为景帝，率军民<b>北京保卫战</b>击退瓦剌。</p></div>
+          <div class="fact"><span class="k">影响</span><p>京军精锐与武将勋贵几乎尽丧，文官集团全面主导朝政；对蒙战略由攻转守，修长城、设九边、置蓟辽重镇，边防格局定型。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item key">
+      <div class="year"><span class="r">1573–1582</span></div>
+      <div class="card">
+        <h3>张居正改革<span class="sub">一条鞭法</span></h3>
+        <ul class="who"><li>张居正</li><li>万历帝</li><li>冯保</li><li>戚继光</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>嘉靖以来国库亏空、宗禄与军费激增，官僚因循推诿，土地兼并而赋役不均。</p></div>
+          <div class="fact"><span class="k">过程</span><p>1572年以首辅执政，推行<b>考成法</b>，以三本簿册考核官员、限期完事；清丈天下田亩，查出隐田两亿余亩；1578年后推广<b>一条鞭法</b>，赋役合并、计亩征银、官收官解；用戚继光守蓟镇、李成梁镇辽东。</p></div>
+          <div class="fact"><span class="k">影响</span><p>太仓存银由亏转盈，国势一度中兴；张居正死后被夺爵抄家，改革多废，但一条鞭法与白银财政已成定局，为清代摊丁入亩铺路。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item">
+      <div class="year"><span class="r">1592–1598</span></div>
+      <div class="card">
+        <h3>万历朝鲜之役<span class="sub">壬辰倭乱</span></h3>
+        <ul class="who"><li>李如松</li><li>邓子龙</li><li>陈璘</li><li>丰臣秀吉</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>丰臣秀吉统一日本后图谋借道朝鲜入明；朝鲜承平二百年、武备废弛，1592年日军登陆釜山，月余陷王京、平壤。</p></div>
+          <div class="fact"><span class="k">过程</span><p>明廷以“唇亡齿寒”出兵，1593年李如松平壤大捷、碧蹄馆受挫后转入对峙；1597年日军再犯，明军水陆并进，1598年露梁海战大破日军，邓子龙战死，秀吉病亡，日军撤归。</p></div>
+          <div class="fact"><span class="k">影响</span><p>“万历三大征”耗尽太仓积储，辽东军力与饷银被大量牵制；朝鲜半岛人口锐减、文物焚毁；日本进入德川幕府时代，东亚秩序暂时稳定。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item key">
+      <div class="year"><span class="r">1616–1619</span></div>
+      <div class="card">
+        <h3>后金崛起与萨尔浒之战</h3>
+        <ul class="who"><li>努尔哈赤</li><li>杨镐</li><li>杜松</li><li>刘綎</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>建州女真在努尔哈赤手中完成统一，创八旗、立满文；1616年于赫图阿拉称汗，国号<b>后金</b>，1618年以“七大恨”誓师反明，连陷抚顺、清河。</p></div>
+          <div class="fact"><span class="k">过程</span><p>1619年明廷集兵十一万，四路合击；努尔哈赤“凭尔几路来，我只一路去”，五日内于萨尔浒、尚间崖、阿布达里冈连破三路，杜松、刘綎战死，杨镐退保沈阳。</p></div>
+          <div class="fact"><span class="k">影响</span><p>辽东攻守易势，明由进攻转为困守；辽饷加派每亩增至九厘，成为压垮民生的重负；后金（1636年改国号清）取得入关前的战略主动。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item">
+      <div class="year"><span class="r">1627–1644</span></div>
+      <div class="card">
+        <h3>明末农民战争<span class="sub">辽饷·剿饷·练饷</span></h3>
+        <ul class="who"><li>李自成</li><li>张献忠</li><li>崇祯帝</li><li>杨嗣昌</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>辽东战事催征辽饷，镇压民变又加剿饷、练饷，三饷合计岁入逾两千万两；陕北连年旱蝗，驿卒裁革，饥民遍地。</p></div>
+          <div class="fact"><span class="k">过程</span><p>1627年王二起事于白水，高迎祥、张献忠、李自成相继响应；1636年高迎祥被俘，李自成继称闯王，提出“均田免赋”，1644年正月建“大顺”于西安，三月十九日破北京，崇祯自缢煤山。</p></div>
+          <div class="fact"><span class="k">影响</span><p>明朝中央政权崩溃；吴三桂引清军入关，李自成败走九宫山，天下归于清。民变的根源——财政加派与吏治腐败——被新朝原封不动地继承下来。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item key">
+      <div class="year"><span>1644</span></div>
+      <div class="card">
+        <h3>甲申之变：明亡与清军入关<span class="sub">易代之年</span></h3>
+        <ul class="who"><li>吴三桂</li><li>多尔衮</li><li>李自成</li><li>史可法</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>李自成围北京，明廷令吴三桂弃宁远率关宁军入卫；清方在皇太极死后由多尔衮摄政，正待时机叩关。</p></div>
+          <div class="fact"><span class="k">过程</span><p>三月李自成入京，吴三桂行至途中闻家被抄、父被拷，返师山海关并乞师于清；四月一片石之战，清军与关宁军合击大顺军，李自成西走；多尔衮入北京，十月顺治即位于此。</p></div>
+          <div class="fact"><span class="k">影响</span><p>明清易代完成，清以“为明复仇”名义确立统治合法性；剃发易服令引发江南大规模抵抗，扬州、江阴、嘉定之难，成为清初最深的民族创伤。</p></div>
+        </div>
+      </div>
+    </article>
+
+  </div>
+
+  <div class="summary">
+    <strong>一 朝 之 变</strong>
+    明把制度做到了极致的严密，却也因此失去了弹性。它既无丞相可问责，也无藩镇可缓冲，
+    一切压力最终都落在皇帝一人与一亿编户身上。当内外危机叠加，崩溃便来得格外彻底。
+  </div>
+</section>
+
+<!-- ================= 清 ================= -->
+<section class="era" id="qing" data-era="qing">
+  <div class="era-head" data-char="清">
+    <p class="era-index">第 三 段</p>
+    <h2>清 <small>1644 — 1912</small></h2>
+    <div class="era-meta">
+      <div><span>建立</span>顺治入关，承明制而治</div>
+      <div><span>都城</span>北京（盛京为陪都）</div>
+      <div><span>极盛</span>康雍乾三朝，疆域一千三百万平方公里</div>
+      <div><span>终结</span>1912年2月12日，宣统退位</div>
+    </div>
+    <p class="era-intro">
+      清是<b>疆域与皇权的双重顶点</b>：军机处把专制推到极致，也把新疆、西藏、蒙古、台湾纳入前所未有的直接管辖。
+      但同一时期，世界正在另一条轨道上加速。前一百五十年是开疆与整合，后七十年是挨打与自救——
+      <b>鸦片战争是分界线，也是两种时间尺度的碰撞</b>。
+    </p>
+  </div>
+
+  <div class="timeline">
+
+    <article class="item key">
+      <div class="year"><span class="r">1644–1662</span></div>
+      <div class="card">
+        <h3>定鼎北京与南明抗清</h3>
+        <ul class="who"><li>多尔衮</li><li>顺治帝</li><li>史可法</li><li>郑成功</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>入关之初清军仅十余万，南方明宗室与官僚相继拥立弘光、隆武、永历诸政权，形成南北对峙。</p></div>
+          <div class="fact"><span class="k">过程</span><p>1645年多铎南下，史可法守扬州城破殉国，南京降；剃发令下，江阴八十一日、嘉定三屠；1659年郑成功北伐南京失利，转图台湾；1662年永历帝被吴三桂缢杀于昆明，南明亡。</p></div>
+          <div class="fact"><span class="k">影响</span><p>统一战争持续近二十年，江南人口与经济遭受重创；满汉分治、圈地投充、逃人法等遗留长期社会矛盾，也促成“康乾盛世”前的秩序重建。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item key">
+      <div class="year"><span class="r">1662–1683</span></div>
+      <div class="card">
+        <h3>收复台湾<span class="sub">从郑氏到府县</span></h3>
+        <ul class="who"><li>郑成功</li><li>施琅</li><li>康熙帝</li><li>郑克塽</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>1624年荷兰东印度公司据大员建热兰遮城；1661年郑成功因北伐受挫、金厦难守，决意东征以为根本。</p></div>
+          <div class="fact"><span class="k">过程</span><p>1661年四月登陆鹿耳门，围热兰遮九月，1662年二月荷兰投降；郑氏建承天府、行屯田。1683年施琅率水师澎湖海战全歼郑军主力，郑克塽降。</p></div>
+          <div class="fact"><span class="k">影响</span><p>1684年设<b>台湾府</b>，隶福建省，下辖三县，驻兵万人；台湾正式纳入中央行政管辖，东南海疆防卫体系建立，迁界禁海随之解除。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item">
+      <div class="year"><span class="r">1673–1681</span></div>
+      <div class="card">
+        <h3>三藩之乱</h3>
+        <ul class="who"><li>吴三桂</li><li>尚可喜</li><li>耿精忠</li><li>康熙帝</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>吴三桂王云南、尚可喜王广东、耿精忠王福建，各拥重兵、自行任官征税，三藩岁需饷银两千余万，几耗天下财赋之半。</p></div>
+          <div class="fact"><span class="k">过程</span><p>1673年尚可喜请撤藩获准，吴三桂、耿精忠被迫同请，朝廷允撤，吴三桂遂反于云南；一度据云贵川湖与闽粤，1678年称帝于衡州，旋病死；康熙分化招抚，1681年昆明城破。</p></div>
+          <div class="fact"><span class="k">影响</span><p>中央集权大为强化，绿营整编、督抚制成熟；此后清朝再无汉人藩王，为统一台湾、三征准噶尔扫清了内部障碍。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item">
+      <div class="year"><span class="r">1685–1689</span></div>
+      <div class="card">
+        <h3>雅克萨之战与《尼布楚条约》</h3>
+        <ul class="who"><li>康熙帝</li><li>彭春</li><li>萨布素</li><li>索额图</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>沙俄自十七世纪中叶东扩至黑龙江流域，哥萨克筑雅克萨、尼布楚为据点，劫掠达斡尔等部。</p></div>
+          <div class="fact"><span class="k">过程</span><p>1685年彭春率军攻雅克萨，俄军降而复据；1686年萨布素再围，俄军困守待援；1689年索额图与戈洛文在尼布楚谈判，以拉丁文签约。</p></div>
+          <div class="fact"><span class="k">影响</span><p>划定中俄东段边界，确认黑龙江、乌苏里江流域属中国，外兴安岭以南领土归属明确；这是中国与欧洲国家签订的第一个具近代形式的边界条约。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item key">
+      <div class="year"><span class="r">1723–1735</span></div>
+      <div class="card">
+        <h3>雍正新政<span class="sub">军机处与摊丁入亩</span></h3>
+        <ul class="who"><li>雍正帝</li><li>鄂尔泰</li><li>田文镜</li><li>李卫</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>康熙晚年九子夺嫡、吏治松弛、国库仅存八百万两；地方火耗横征，丁银按人头征收，隐匿人口严重。</p></div>
+          <div class="fact"><span class="k">过程</span><p>推行<b>摊丁入亩</b>，丁银并入田赋，无地者不纳丁银；<b>火耗归公</b>并设养廉银；在西南大规模<b>改土归流</b>；1729年因西北用兵设<b>军机处</b>，后成常设中枢；密折制度令官员互相监督。</p></div>
+          <div class="fact"><span class="k">影响</span><p>国库存银增至六千万两，行政效率与财政透明度大增，人口统计因丁银取消而趋于真实；皇权达于极致，军机处使内阁形同虚设，为乾隆盛世奠定制度基础。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item key">
+      <div class="year"><span class="r">1755–1759</span></div>
+      <div class="card">
+        <h3>平定准部与回部，统一新疆</h3>
+        <ul class="who"><li>乾隆帝</li><li>兆惠</li><li>阿睦尔撒纳</li><li>大小和卓</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>准噶尔汗国雄踞天山以北百余年，与清廷时战时和；1750年代其内乱频仍，辉特部首领阿睦尔撒纳降清又叛。</p></div>
+          <div class="fact"><span class="k">过程</span><p>1755年清军两路入伊犁，灭准噶尔汗国；1757年平阿睦尔撒纳，1759年兆惠平定大小和卓，天山南路底定。</p></div>
+          <div class="fact"><span class="k">影响</span><p>新疆全境纳入版图，设<b>伊犁将军</b>统辖，驻兵屯田、置卡伦台站；1771年土尔扈特部自伏尔加河東归；《西域图志》编纂，西北疆域与多民族治理格局确立。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item">
+      <div class="year"><span>1793</span></div>
+      <div class="card">
+        <h3>马戛尔尼使华<span class="sub">错过的相遇</span></h3>
+        <ul class="who"><li>乾隆帝</li><li>马戛尔尼</li><li>和珅</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>英国已完成工业革命，亟需开辟东方市场；1792年以祝贺乾隆八十大寿为名遣使，携天文仪器、蒸汽机模型、军舰模型等礼品。</p></div>
+          <div class="fact"><span class="k">过程</span><p>1793年使团抵热河，围绕<b>跪拜礼仪</b>争执不下，最终以单膝礼觐见；英方提出开放口岸、设常驻使馆、划定居留地等要求，被逐条拒绝；乾隆敕谕“天朝物产丰盈，无所不有，原不藉外夷货物以通有无”。</p></div>
+          <div class="fact"><span class="k">影响</span><p>中西外交在礼仪与体制的错位中擦肩而过，清朝失去最后一次和平了解世界的机会；半个世纪后，双方以战争方式再次相遇。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item key">
+      <div class="year"><span class="r">1839–1842</span></div>
+      <div class="card">
+        <h3>鸦片战争<span class="sub">近代史的开端</span></h3>
+        <ul class="who"><li>林则徐</li><li>道光帝</li><li>义律</li><li>璞鼎查</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>英国为扭转贸易逆差大量输入鸦片，白银外流、烟毒泛滥；1839年林则徐赴粤，虎门销烟二万余箱，成为战争导火索。</p></div>
+          <div class="fact"><span class="k">过程</span><p>1840年英军北上陷定海、抵大沽口；1841年占香港岛、攻破广州，三元里民众抗英；1842年吴淞、镇江失守，英舰抵南京，清廷被迫签约。</p></div>
+          <div class="fact"><span class="k">影响</span><p>《南京条约》割香港岛、赔款两千一百万银元、开五口通商、协定关税、废除公行；中国主权完整被破坏，<b>开始沦为半殖民地半封建社会</b>，社会主要矛盾与革命任务随之改变。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item key">
+      <div class="year"><span class="r">1851–1864</span></div>
+      <div class="card">
+        <h3>太平天国运动</h3>
+        <ul class="who"><li>洪秀全</li><li>杨秀清</li><li>曾国藩</li><li>李鸿章</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>鸦片战后赔款摊派、白银外流、广西灾荒，天地会与拜上帝会势力蔓延；洪秀全以《劝世良言》创立拜上帝会。</p></div>
+          <div class="fact"><span class="k">过程</span><p>1851年金田起义，建号太平天国；1853年定都天京，颁《天朝田亩制度》，北伐西征，鼎盛时控鄂皖赣苏；1856年<b>天京事变</b>，杨秀清、韦昌辉被杀，石达开出走；1864年天京陷落。</p></div>
+          <div class="fact"><span class="k">影响</span><p>人口损失以千万计，江南经济残破；<b>湘军、淮军</b>等地方武装崛起，督抚权力坐大，汉族官僚权重上升；《资政新篇》首次提出发展资本主义的方案，虽未实行。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item">
+      <div class="year"><span class="r">1856–1860</span></div>
+      <div class="card">
+        <h3>第二次鸦片战争<span class="sub">火烧圆明园</span></h3>
+        <ul class="who"><li>咸丰帝</li><li>叶名琛</li><li>额尔金</li><li>奕䜣</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>英法欲扩大在华权益、修约要求被拒，“亚罗号事件”“马神甫事件”成为借口；清廷正陷于太平天国，无力北顾。</p></div>
+          <div class="fact"><span class="k">过程</span><p>1856年英法联军攻广州，1858年北上陷大沽、订《天津条约》；1860年再战，八里桥溃败，咸丰奔热河，联军入北京、<b>焚圆明园</b>，订《北京条约》。</p></div>
+          <div class="fact"><span class="k">影响</span><p>增开天津等十一口、割九龙司、赔款倍增，允许公使驻京与传教；<b>总理各国事务衙门</b>设立，洋务运动由此启动；沙俄趁机割占东北、西北一百五十余万平方公里。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item key">
+      <div class="year"><span class="r">1861–1895</span></div>
+      <div class="card">
+        <h3>洋务运动<span class="sub">自强与求富</span></h3>
+        <ul class="who"><li>奕䜣</li><li>曾国藩</li><li>李鸿章</li><li>左宗棠</li><li>张之洞</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>内忧外患交逼，部分官僚认为“中国文武制度事事远出西人之上，独火器万不能及”，主张“师夷长技以制夷”。</p></div>
+          <div class="fact"><span class="k">过程</span><p>设总理衙门、同文馆，办江南制造总局、福州船政局、金陵机器局；创办轮船招商局、开平矿务局、汉阳铁厂、湖北织布局；建北洋水师，派幼童赴美留学。</p></div>
+          <div class="fact"><span class="k">影响</span><p>中国近代工业、电报、铁路、新式学堂与海军初具规模，社会风气渐开；但“中体西用”不改制度、官督商办积弊丛生，甲午一战即为检验，证明仅学器物不足以图存。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item key">
+      <div class="year"><span class="r">1894–1895</span></div>
+      <div class="card">
+        <h3>甲午战争与《马关条约》</h3>
+        <ul class="who"><li>光绪帝</li><li>李鸿章</li><li>丁汝昌</li><li>伊藤博文</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>日本明治维新后以“大陆政策”对外扩张，借朝鲜东学党起义之机出兵；清廷寄望列强调停，备战不足。</p></div>
+          <div class="fact"><span class="k">过程</span><p>1894年丰岛海战爆发，平壤之战失利，黄海海战北洋舰队受重创；1895年威海卫保卫战，丁汝昌自尽，舰队覆没；李鸿章赴日议和，遇刺后签约。</p></div>
+          <div class="fact"><span class="k">影响</span><p>割台湾、澎湖列岛，赔款两亿两，开沙市、重庆、苏州、杭州为商埠，允许日人在华设厂；<b>列强掀起瓜分狂潮</b>，救亡图存由“器物”转向“制度”，直接催生戊戌变法。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item">
+      <div class="year"><span>1898</span></div>
+      <div class="card">
+        <h3>戊戌变法<span class="sub">一百零三天</span></h3>
+        <ul class="who"><li>光绪帝</li><li>康有为</li><li>梁启超</li><li>慈禧太后</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>甲午惨败与瓜分危机震动朝野，公车上书、强学会、《时务报》推动维新思潮；光绪帝欲借变法摆脱慈禧控制。</p></div>
+          <div class="fact"><span class="k">过程</span><p>1898年6月11日颁“明定国是”诏，百日间发谕旨百余道：废八股、改科举，办京师大学堂，设农工商总局，裁冗官、练新军；9月21日慈禧发动政变，囚光绪，谭嗣同等<b>戊戌六君子</b>遇害。</p></div>
+          <div class="fact"><span class="k">影响</span><p>变法失败，但新学、报刊、学会已深入人心，士林风气为之一变；清廷两年后自办“新政”，内容多沿戊戌旧章，改革主导权却已流失。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item">
+      <div class="year"><span class="r">1900–1901</span></div>
+      <div class="card">
+        <h3>庚子国变与《辛丑条约》</h3>
+        <ul class="who"><li>慈禧太后</li><li>载漪</li><li>义和团</li><li>八国联军</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>瓜分危机下民教冲突激化，义和团以“扶清灭洋”口号蔓延直鲁；慈禧因列强阻其废立光绪，决意利用拳民。</p></div>
+          <div class="fact"><span class="k">过程</span><p>1900年六月义和团入京，围攻使馆；八国联军自大沽登陆，陷天津、北京，慈禧挟光绪西逃西安；东南督抚与列强“东南互保”，中央权威受损。</p></div>
+          <div class="fact"><span class="k">影响</span><p>《辛丑条约》赔款四亿五千万两、本息合计约九亿八千万两，划使馆界、驻兵北京至山海关、禁民反帝；清廷彻底沦为“洋人的朝廷”，<b>新政与革命开始赛跑</b>。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item">
+      <div class="year"><span>1905</span></div>
+      <div class="card">
+        <h3>废科举与同盟会成立</h3>
+        <ul class="who"><li>袁世凯</li><li>张之洞</li><li>孙中山</li><li>黄兴</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>科举所考与近代所需严重脱节，新式学堂与留学日本成风气；革命团体华兴会、光复会等相继成立。</p></div>
+          <div class="fact"><span class="k">过程</span><p>1905年9月，清廷诏停科举，自次年起各省岁科考试一律停止，推广学堂、奖励留学；同年8月，中国同盟会在东京成立，提出“驱除鞑虏，恢复中华，创立民国，平均地权”。</p></div>
+          <div class="fact"><span class="k">影响</span><p>延续一千三百年的科举制终结，士绅阶层转向新学、报刊、实业与革命；同盟会统一了革命组织与纲领，为辛亥革命准备了干部与舆论。</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="item key">
+      <div class="year"><span class="r">1911–1912</span></div>
+      <div class="card">
+        <h3>辛亥革命与清帝退位<span class="sub">帝制终结</span></h3>
+        <ul class="who"><li>孙中山</li><li>黄兴</li><li>袁世凯</li><li>隆裕太后</li></ul>
+        <div class="facts">
+          <div class="fact"><span class="k">背景</span><p>“皇族内阁”令立宪派失望，保路运动激化川鄂矛盾；湖北新军受革命党影响深厚。</p></div>
+          <div class="fact"><span class="k">过程</span><p>1911年10月10日武昌起义，两月内十余省宣布独立；12月南北议和，孙中山自海外归国，1912年1月1日就任临时大总统，中华民国成立；2月12日宣统帝退位。</p></div>
+          <div class="fact"><span class="k">影响</span><p>两千一百余年帝制终结，共和观念自此不可逆转；《临时约法》确立主权在民原则；但革命未触及基层社会，军阀政治与中央权威的真空随之而来。</p></div>
+        </div>
+      </div>
+    </article>
+
+  </div>
+
+  <div class="summary">
+    <strong>一 朝 之 变</strong>
+    清把传统中国的疆域、人口与专制技术都推到了极限，却始终没有解决一个根本问题：
+    当外部世界以工业与条约体系重写规则时，一个以农为本、以皇权为轴的帝国，如何在不变的前提下应变。它试过器物、试过制度、试过新政，都晚了一步。
+  </div>
+</section>
+
+<!-- ================= 对照与主线 ================= -->
+<section class="coda">
+  <h2>三朝对照</h2>
+  <p class="sub">D Y N A S T I C &nbsp; C O M P A R I S O N</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th style="width:96px"></th><th class="t">唐 618—907</th><th class="m">明 1368—1644</th><th class="q">清 1644—1912</th></tr>
+      </thead>
+      <tbody>
+        <tr><th>建立</th><td>李渊受隋禅，定都长安</td><td>朱元璋北伐逐元，定都应天</td><td>顺治入关，承明制而治</td></tr>
+        <tr><th>都城</th><td>长安，东都洛阳</td><td>南京 → 北京（1421年迁）</td><td>北京，盛京为陪都</td></tr>
+        <tr><th>鼎盛</th><td>贞观至开元（627—741）</td><td>永乐至仁宣（1403—1435）</td><td>康雍乾（1662—1795）</td></tr>
+        <tr><th>中枢</th><td>三省六部，政事堂议政</td><td>废丞相，内阁票拟、宦官批红</td><td>军机处承旨，皇权绝对化</td></tr>
+        <tr><th>选官</th><td>科举渐重，门荫并行</td><td>科举鼎盛，八股取士</td><td>承明制，1905年废科举</td></tr>
+        <tr><th>兵制</th><td>府兵 → 募兵（节度使）</td><td>卫所 → 募兵（营兵）</td><td>八旗绿营 → 勇营 → 新军</td></tr>
+        <tr><th>赋税</th><td>租庸调 → 两税法（780）</td><td>一条鞭法（1578年后推广）</td><td>摊丁入亩，厘金与海关</td></tr>
+        <tr><th>边疆</th><td>羁縻府州、都护府、和亲</td><td>九边防御，土司制度</td><td>改土归流，设伊犁将军、驻藏大臣</td></tr>
+        <tr><th>灭亡</th><td>907年朱温篡唐，藩镇坐大</td><td>1644年民变入京，外患并至</td><td>1912年清帝退位，革命鼎革</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="threads">
+    <div class="thread">
+      <span class="n">线 索 一</span>
+      <h4>皇权一路向上</h4>
+      <p>唐之三省六部，诏令须经中书、门下，皇帝不能独断；明废丞相，皇帝亲理庶政，遂以内阁、宦官补位；清设军机处，大臣“只供传述缮撰，而不能稍有赞画于其间”。<b>相权递减、皇权递增</b>，至清而极。</p>
+    </div>
+    <div class="thread">
+      <span class="n">线 索 二</span>
+      <h4>人身控制一路放松</h4>
+      <p>从租庸调按丁征课，到两税法“唯以资产为宗”，再到一条鞭法计亩征银、摊丁入亩“丁银并入田赋”，赋税标准由人转向地、由实物转向白银。<b>国家不再需要把人钉在户籍上</b>，人口流动与社会活力随之释放。</p>
+    </div>
+    <div class="thread">
+      <span class="n">线 索 三</span>
+      <h4>对外姿态一路内收</h4>
+      <p>唐以天可汗体系包容万邦，长安胡商云集；明初七下西洋后转向海禁，“片板不许下海”；清承海禁，仅留广州一口。开放—内收—被迫开放，<b>三次转折的性质完全不同</b>：前两次是主动选择，最后一次是条约强加。</p>
+    </div>
+    <div class="thread">
+      <span class="n">线 索 四</span>
+      <h4>危机总在财政上爆发</h4>
+      <p>安史之乱前的节度使财政自立，明末的三饷加派，清末的赔款与厘金——三个王朝的崩溃都不是单纯军事失败，而是<b>财政体系无法再吸收冲击</b>。制度的韧性，最终取决于它能不能收上钱、又收得不至于激起民变。</p>
+    </div>
+  </div>
+
+  <p class="quote">
+    读年表的意义，不在于记住哪一年发生了什么，<br>
+    而在于看见：每一个当时看来理所当然的选择，<br>
+    都在几十年后变成无法回头的路。
+    <em>—— 三十七事，一千三百年</em>
+  </p>
+</section>
+
+<footer>
+  本页依据通行史学叙述整理，年份采用公历；<br>
+  部分事件年代有异说，取较为通行者。人物仅列关键数人，非全部参与者。
+</footer>
+
+<script>
+(function(){
+  var progress = document.getElementById('progress');
+  var barLinks = Array.prototype.slice.call(document.querySelectorAll('.erabar a'));
+  var sections = Array.prototype.slice.call(document.querySelectorAll('.era'));
+
+  function onScroll(){
+    var h = document.documentElement;
+    var max = h.scrollHeight - h.clientHeight;
+    var p = max > 0 ? (h.scrollTop || document.body.scrollTop) / max : 0;
+    progress.style.width = (p * 100).toFixed(2) + '%';
+
+    var pos = (h.scrollTop || document.body.scrollTop) + 140;
+    var current = null;
+    sections.forEach(function(s){
+      if (s.offsetTop <= pos) current = s.getAttribute('data-era');
+    });
+    barLinks.forEach(function(a){
+      a.classList.toggle('on', a.getAttribute('data-era') === current);
+    });
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  window.addEventListener('resize', onScroll);
+  onScroll();
+
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting){
+          var el = e.target;
+          var idx = Array.prototype.indexOf.call(el.parentNode.children, el);
+          el.style.transitionDelay = Math.min(idx, 4) * 60 + 'ms';
+          el.classList.add('in');
+          io.unobserve(el);
+        }
+      });
+    }, {rootMargin:'0px 0px -8% 0px', threshold:0.08});
+    document.querySelectorAll('.item').forEach(function(el){ io.observe(el); });
+  } else {
+    document.querySelectorAll('.item').forEach(function(el){ el.classList.add('in'); });
+  }
+})();
+</script>
+</body>
+</html>
