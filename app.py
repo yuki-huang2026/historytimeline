@@ -5,7 +5,7 @@ import json
 import re
 
 # =========================================
-API_KEY = st.secrets["DEEPSEEK_KEY"]
+API_KEY = "sk-59f7ba787a4f46c7846157a043f463e9"
 # =========================================
 
 API_URL = "https://api.deepseek.com/chat/completions"
