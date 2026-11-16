@@ -14,7 +14,7 @@ MODEL_NAME = "deepseek-chat"
 st.set_page_config(page_title="时空经纬", layout="wide")
 
 # ==========================================
-# 🔥 素材库
+# 🔥 素材库（Logo 还是读取原位置，只要覆盖上传同名的图就行）
 # ==========================================
 bg1 = "https://cdn.jsdelivr.net/gh/yuki-huang2026/historytimeline@main/qianli.png"
 bg2 = "https://cdn.jsdelivr.net/gh/yuki-huang2026/historytimeline@main/fuchun.png"
@@ -25,7 +25,7 @@ backtop_url = "https://cdn.jsdelivr.net/gh/yuki-huang2026/historytimeline@main/b
 search_url = "https://cdn.jsdelivr.net/gh/yuki-huang2026/historytimeline@main/search.png"
 
 # ==========================================
-# 🎨 核心 CSS (优化了Tab和表格)
+# 🎨 核心 CSS (强制覆盖 Tab 按钮样式)
 # ==========================================
 st.markdown('<div id="top"></div>', unsafe_allow_html=True)
 
@@ -74,25 +74,26 @@ st.markdown(f"""
         background-position: 12px center; background-repeat: no-repeat; padding-left: 40px !important;
     }}
     
-    /* 🔥 优化：文件夹页签风格的 Tabs */
+    /* 🔥 彻底解决三个按键的样式问题：改变其整体容器和按钮本身 */
     .stTabs [data-baseweb="tab-list"] {{
-        gap: 10px; justify-content: center; background-color: transparent !important; margin-bottom: 20px;
+        gap: 15px; justify-content: center; background: transparent !important; margin-bottom: 20px;
     }}
     .stTabs [data-baseweb="tab"] {{
-        font-size: 18px; font-weight: bold; color: #1C3A5E;
-        background-color: rgba(255, 255, 255, 0.5); 
-        border-radius: 12px 12px 0 0 !important;
-        padding: 10px 25px !important; border: 1px solid rgba(255,255,255,0.6) !important; border-bottom: none !important;
+        font-size: 18px; font-weight: bold; color: #1C3A5E !important;
+        background-color: #ffffff !important; /* 强制白底 */
+        border-radius: 10px !important;
+        padding: 10px 25px !important; 
+        border: 2px solid #1C3A5E !important;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
         transition: all 0.3s ease;
     }}
     .stTabs [aria-selected="true"] {{
-        background-color: rgba(255, 255, 255, 0.95) !important;
-        color: #8B0000 !important;
-        box-shadow: 0 -4px 10px rgba(0,0,0,0.05) !important;
-        border-top: 3px solid #1C3A5E !important;
+        background-color: #1C3A5E !important; /* 选中的变成深蓝色 */
+        color: #ffffff !important; /* 文字变白 */
+        transform: translateY(-2px) !important;
     }}
     
-    /* 🔥 修复：给 Markdown 表格加白底和阴影，彻底隔绝背景 */
+    /* 表格白底 */
     .stMarkdown table {{ 
         border-collapse: collapse; width: 100%; margin: 15px 0; 
         background-color: rgba(255, 255, 255, 0.95) !important; 
@@ -121,18 +122,25 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 🔥 Prompt 更新：死命令要求至少15个，上不封顶
+# 🔥 Prompt 终极防偷懒版
 # ==========================================
 PROMPT_TIMELINE = """
-你是一个历史事件分类助手。你的任务是提取多维历史事件。
-## 分类体系：一级标签：政治、经济、文化、军事。
-## 输出要求（极其重要，违反将导致系统崩溃）
-1. 【死命令】：必须输出至少 15 个核心历史事件！上不封顶！绝对不可以少于 15 个！如果该朝代事件较少，请将同一重大事件的细分节点列出补足；如果时间跨度长，请均匀选取早、中、晚期事件。
-2. 严格按起始年份排序。
-3. 必须且只能输出标准的JSON数组，不要有任何废话！
-4. 必须严格按照以下格式拆解内容：
-格式：[{"year": "年份", "event": "事件名", "tags": "主+次", "background": "背景原因(15字内)", "process": "经过(20字内)", "impact": "影响结果(20字内)"}]
-请为我生成【{user_input}】的核心历史事件时间轴。
+你是一个数据提取引擎。你的唯一功能是将历史事件转化为严格的JSON数组。
+## 任务背景
+用户会输入一个朝代。你需要列出该朝代的核心历史事件。
+## 分类体系
+一级标签：政治、经济、文化、军事。
+## 🚨 核心输出限制（违反将被视为失败）
+1. 【绝对不可少于15个事件】！上不封顶！严禁模型因为“觉得够了”而提前停止输出！
+2. 必须涵盖该朝代的早期、中期、晚期！不要只挑最出名的3、4个，要把所有重要的转折点、战役、变法、文化盛事都列出来！
+3. 严格按年份先后顺序排列。
+4. 必须且只能输出一个标准的JSON数组。不要输出任何“好的”、“以下是”等废话。
+5. 格式必须完全如下（不要带 ```json 标记）：
+[
+  {"year": "年份", "event": "事件名", "tags": "主+次", "background": "背景", "process": "过程", "impact": "影响"},
+  {"year": "年份", "event": "事件名", "tags": "主+次", "background": "背景", "process": "过程", "impact": "影响"}
+]
+请立刻提取【{user_input}】的15个以上核心事件，输出JSON。
 """
 
 PROMPT_COMPARE = """
@@ -156,15 +164,15 @@ def call_ai(system_prompt):
     payload = {
         "model": MODEL_NAME, 
         "messages": [{"role": "system", "content": system_prompt}], 
-        "temperature": 0.3, 
-        "max_tokens": 8000  # 调高上限，防止15个事件被截断
+        "temperature": 0.1, # 调低温度，让模型更听从指令，少发散
+        "max_tokens": 8000
     }
     try:
-        resp = requests.post(API_URL, headers=headers, json=payload, timeout=180) # 时间也调长一点
+        resp = requests.post(API_URL, headers=headers, json=payload, timeout=180)
         resp.raise_for_status()
         return resp.json()["choices"][0]["message"]["content"]
     except Exception as e:
-        st.error(f"AI 请求失败，请检查网络或 Key。错误信息: {e}")
+        st.error(f"AI 请求失败: {e}")
         return None
 
 tab1, tab2, tab3 = st.tabs(["📅 AI 智能时间轴", "⚖️ 史料互证", "🔮 假设互动"])
@@ -178,7 +186,7 @@ with tab1:
         generate_btn = st.button("🚀 生成时间轴", key="btn1")
     
     if generate_btn and timeline_input:
-        with st.spinner("AI 正在梳理史料（提取15个以上事件可能需要更长时间）..."):
+        with st.spinner("AI 正在深入挖掘史料（提取15+事件耗时较长，请耐心等待）..."):
             prompt = PROMPT_TIMELINE.replace("{user_input}", timeline_input)
             ai_text = call_ai(prompt)
             if ai_text:
@@ -192,6 +200,7 @@ with tab1:
                         e["year"] = str(int(year_num.group())) if year_num else "0"
                     events.sort(key=lambda x: int(x["year"]))
 
+                    # 如果有超过15个事件，页面依然自适应撑开
                     header_html = f"""
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid rgba(210, 180, 140, 0.5); padding-bottom: 15px;">
                         <div style="font-size: 26px; font-weight: bold; color: #1C3A5E;">
@@ -245,7 +254,7 @@ with tab1:
                                 window.parent.postMessage({{ type: 'streamlit:setFrameHeight', height: height }}, '*');
                             }}
                             window.addEventListener('load', resizeIframe);
-                            setTimeout(resizeIframe, 500); 
+                            setTimeout(resizeIframe, 1000); // 稍微多等一会，确保长列表完全渲染
                         </script>
                     </body></html>
                     """
