@@ -5,7 +5,7 @@ import json
 import re
 
 # =========================================
-API_KEY = "sk-59f7ba787a4f46c7846157a043f463e9"
+API_KEY = "sk-59f7ba787a4f46c7846157a043f463e9" 
 # =========================================
 
 API_URL = "https://api.deepseek.com/chat/completions"
@@ -25,7 +25,7 @@ backtop_url = "https://cdn.jsdelivr.net/gh/yuki-huang2026/historytimeline@main/b
 search_url = "https://cdn.jsdelivr.net/gh/yuki-huang2026/historytimeline@main/search.png"
 
 # ==========================================
-# 🎨 核心 CSS 与顶部锚点
+# 🎨 核心 CSS (优化了Tab和表格)
 # ==========================================
 st.markdown('<div id="top"></div>', unsafe_allow_html=True)
 
@@ -35,7 +35,6 @@ st.markdown(f"""
     header {{visibility: hidden;}}
     footer {{visibility: hidden;}}
 
-    /* 背景轮播 */
     .stApp {{
         background-size: cover; background-position: center; background-attachment: fixed;
         animation: bgSlider 24s infinite;
@@ -46,14 +45,12 @@ st.markdown(f"""
         66%, 100% {{ background-image: url('{bg3}'); }}
     }}
     
-    /* 宣纸护眼遮罩 */
     .stApp::before {{
         content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
         background-color: rgba(245, 235, 210, 0.85); 
         z-index: -1;
     }}
 
-    /* 主容器居中 */
     .main .block-container {{
         max-width: 1000px !important; 
         margin: 0 auto !important;
@@ -77,17 +74,33 @@ st.markdown(f"""
         background-position: 12px center; background-repeat: no-repeat; padding-left: 40px !important;
     }}
     
-    .stTabs [data-baseweb="tab-list"] {{ gap: 20px; justify-content: center; }}
+    /* 🔥 优化：文件夹页签风格的 Tabs */
+    .stTabs [data-baseweb="tab-list"] {{
+        gap: 10px; justify-content: center; background-color: transparent !important; margin-bottom: 20px;
+    }}
     .stTabs [data-baseweb="tab"] {{
         font-size: 18px; font-weight: bold; color: #1C3A5E;
-        background-color: rgba(255, 255, 255, 0.7); border-radius: 10px; padding: 10px 20px;
+        background-color: rgba(255, 255, 255, 0.5); 
+        border-radius: 12px 12px 0 0 !important;
+        padding: 10px 25px !important; border: 1px solid rgba(255,255,255,0.6) !important; border-bottom: none !important;
+        transition: all 0.3s ease;
+    }}
+    .stTabs [aria-selected="true"] {{
+        background-color: rgba(255, 255, 255, 0.95) !important;
+        color: #8B0000 !important;
+        box-shadow: 0 -4px 10px rgba(0,0,0,0.05) !important;
+        border-top: 3px solid #1C3A5E !important;
     }}
     
-    .stMarkdown table {{ border-collapse: collapse; width: 100%; margin: 10px 0; }}
-    .stMarkdown th, .stMarkdown td {{ border: 1px solid rgba(28, 58, 94, 0.3); padding: 10px; text-align: left; }}
-    .stMarkdown th {{ background-color: rgba(135, 180, 220, 0.6); color: white; }}
+    /* 🔥 修复：给 Markdown 表格加白底和阴影，彻底隔绝背景 */
+    .stMarkdown table {{ 
+        border-collapse: collapse; width: 100%; margin: 15px 0; 
+        background-color: rgba(255, 255, 255, 0.95) !important; 
+        border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }}
+    .stMarkdown th {{ background-color: #1C3A5E !important; color: white !important; padding: 12px; text-align: left; }}
+    .stMarkdown td {{ border-bottom: 1px solid rgba(0,0,0,0.05); padding: 12px; color: #333 !important; }}
     
-    /* 全局回顶按钮 */
     .global-backtop {{
         position: fixed; bottom: 40px; right: 40px; z-index: 9999;
         width: 50px; height: 50px; cursor: pointer; opacity: 0.8; transition: opacity 0.3s;
@@ -100,7 +113,6 @@ st.markdown(f"""
     </a>
 """, unsafe_allow_html=True)
 
-# 页面头部
 st.markdown(f"""
     <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
         <img src="{logo_url}" style="width: 60px; height: 40px; object-fit: contain; margin-right: 15px;">
@@ -108,23 +120,28 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-# Prompts
+# ==========================================
+# 🔥 Prompt 更新：死命令要求至少15个，上不封顶
+# ==========================================
 PROMPT_TIMELINE = """
 你是一个历史事件分类助手。你的任务是提取多维历史事件。
 ## 分类体系：一级标签：政治、经济、文化、军事。
-## 输出要求（极其重要）
-1. 必须提取 8 到 10 个核心历史事件！严格按起始年份排序。
-2. 必须且只能输出标准的JSON数组，不要有任何废话！
-3. 必须严格按照以下格式拆解内容：
+## 输出要求（极其重要，违反将导致系统崩溃）
+1. 【死命令】：必须输出至少 15 个核心历史事件！上不封顶！绝对不可以少于 15 个！如果该朝代事件较少，请将同一重大事件的细分节点列出补足；如果时间跨度长，请均匀选取早、中、晚期事件。
+2. 严格按起始年份排序。
+3. 必须且只能输出标准的JSON数组，不要有任何废话！
+4. 必须严格按照以下格式拆解内容：
 格式：[{"year": "年份", "event": "事件名", "tags": "主+次", "background": "背景原因(15字内)", "process": "经过(20字内)", "impact": "影响结果(20字内)"}]
 请为我生成【{user_input}】的核心历史事件时间轴。
 """
+
 PROMPT_COMPARE = """
 你是一名极其严谨的历史史料对比研究助手。请针对指定的历史事件，进行多源史料的深度对比。
 【防胡编乱造铁律】标注五级证据等级。矛盾并列。
 【输出格式】输出【史料档案表】和【逐维度对比表】，格式为 Markdown 表格。
 事件是：【{user_input}】。直接输出结果。
 """
+
 PROMPT_HYPOTHESIS = """
 你是一名严谨的历史学专家。请围绕用户提出的历史假设进行客观的反事实推演。
 【输出格式】
@@ -136,16 +153,21 @@ PROMPT_HYPOTHESIS = """
 
 def call_ai(system_prompt):
     headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
-    payload = {"model": MODEL_NAME, "messages": [{"role": "system", "content": system_prompt}], "temperature": 0.1, "max_tokens": 3000}
+    payload = {
+        "model": MODEL_NAME, 
+        "messages": [{"role": "system", "content": system_prompt}], 
+        "temperature": 0.3, 
+        "max_tokens": 8000  # 调高上限，防止15个事件被截断
+    }
     try:
-        resp = requests.post(API_URL, headers=headers, json=payload, timeout=120)
+        resp = requests.post(API_URL, headers=headers, json=payload, timeout=180) # 时间也调长一点
         resp.raise_for_status()
         return resp.json()["choices"][0]["message"]["content"]
     except Exception as e:
-        st.error(f"AI 请求失败: {e}")
+        st.error(f"AI 请求失败，请检查网络或 Key。错误信息: {e}")
         return None
 
-tab1, tab2, tab3 = st.tabs(["📅 历史时间轴", "⚖️ 史料互证", "🔮 假设互动"])
+tab1, tab2, tab3 = st.tabs(["📅 AI 智能时间轴", "⚖️ 史料互证", "🔮 假设互动"])
 
 with tab1:
     col1, col2 = st.columns([3, 1])
@@ -156,7 +178,7 @@ with tab1:
         generate_btn = st.button("🚀 生成时间轴", key="btn1")
     
     if generate_btn and timeline_input:
-        with st.spinner("AI 正在梳理史料..."):
+        with st.spinner("AI 正在梳理史料（提取15个以上事件可能需要更长时间）..."):
             prompt = PROMPT_TIMELINE.replace("{user_input}", timeline_input)
             ai_text = call_ai(prompt)
             if ai_text:
@@ -212,30 +234,24 @@ with tab1:
                         </div>
                         """
                     
-                    # 🔥 核心修复：注入 JS 动态计算高度
                     full_html = f"""
                     <!DOCTYPE html><html><head><meta charset="utf-8"></head>
                     <body style="margin:0; padding:10px; font-family: 'KaiTi', '思源黑体', sans-serif; background: transparent;">
                         {header_html}
                         <div style="max-width: 100%; margin: 0 auto;">{html_items}</div>
-                        
-                        <!-- 这段 JS 会告诉外面的 Streamlit 框，我的真实高度是多少 -->
                         <script>
                             function resizeIframe() {{
                                 var height = document.body.scrollHeight;
                                 window.parent.postMessage({{ type: 'streamlit:setFrameHeight', height: height }}, '*');
                             }}
                             window.addEventListener('load', resizeIframe);
-                            setTimeout(resizeIframe, 500); // 等图片加载出来再算一次
+                            setTimeout(resizeIframe, 500); 
                         </script>
                     </body></html>
                     """
-                    # 初始给个 800，JS 会自动撑开
                     components.html(full_html, height=800, scrolling=False)
                 except Exception as e:
                     st.warning(f"解析失败，可能是 AI 没按格式输出，请再点一次。")
-            else:
-                st.error("AI 没有返回内容。")
 
 with tab2:
     st.subheader("多源史料互证与考证")
