@@ -14,7 +14,7 @@ MODEL_NAME = "deepseek-chat"
 st.set_page_config(page_title="时空经纬", layout="wide")
 
 # ==========================================
-# 🔥 素材库（Logo 还是读取原位置，只要覆盖上传同名的图就行）
+# 🔥 素材库
 # ==========================================
 bg1 = "https://cdn.jsdelivr.net/gh/yuki-huang2026/historytimeline@main/qianli.png"
 bg2 = "https://cdn.jsdelivr.net/gh/yuki-huang2026/historytimeline@main/fuchun.png"
@@ -25,7 +25,7 @@ backtop_url = "https://cdn.jsdelivr.net/gh/yuki-huang2026/historytimeline@main/b
 search_url = "https://cdn.jsdelivr.net/gh/yuki-huang2026/historytimeline@main/search.png"
 
 # ==========================================
-# 🎨 核心 CSS (强制覆盖 Tab 按钮样式)
+# 🎨 核心 CSS：新拟态3D按钮 + 强制去红线
 # ==========================================
 st.markdown('<div id="top"></div>', unsafe_allow_html=True)
 
@@ -74,23 +74,35 @@ st.markdown(f"""
         background-position: 12px center; background-repeat: no-repeat; padding-left: 40px !important;
     }}
     
-    /* 🔥 彻底解决三个按键的样式问题：改变其整体容器和按钮本身 */
+    /* 🔥 杀手锏：强制去掉 Streamlit 默认的那根红线 */
+    .stTabs [data-baseweb="tab-highlight"] {{ display: none !important; }}
+    .stTabs [data-baseweb="tab-border"] {{ display: none !important; }}
+    
+    /* 🔥 新拟态3D按钮设计 */
     .stTabs [data-baseweb="tab-list"] {{
-        gap: 15px; justify-content: center; background: transparent !important; margin-bottom: 20px;
+        gap: 20px; justify-content: center; background: transparent !important; margin-bottom: 30px; padding-top: 10px;
     }}
     .stTabs [data-baseweb="tab"] {{
-        font-size: 18px; font-weight: bold; color: #1C3A5E !important;
-        background-color: #ffffff !important; /* 强制白底 */
-        border-radius: 10px !important;
-        padding: 10px 25px !important; 
-        border: 2px solid #1C3A5E !important;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
-        transition: all 0.3s ease;
+        font-size: 18px; font-weight: bold; color: #555 !important;
+        /* 凸起质感 */
+        background: #F5F5F5 !important; 
+        border-radius: 15px !important;
+        padding: 12px 30px !important; 
+        border: 1px solid rgba(255,255,255,0.8) !important;
+        box-shadow: 4px 4px 10px rgba(0,0,0,0.1), -4px -4px 10px rgba(255,255,255,0.8) !important;
+        transition: all 0.2s ease;
     }}
+    /* 鼠标悬浮 */
+    .stTabs [data-baseweb="tab"]:hover {{
+        transform: translateY(-2px);
+        box-shadow: 6px 6px 15px rgba(0,0,0,0.15), -6px -6px 15px rgba(255,255,255,0.9) !important;
+    }}
+    /* 选中状态（按下去的凹陷感 + 加深颜色） */
     .stTabs [aria-selected="true"] {{
-        background-color: #1C3A5E !important; /* 选中的变成深蓝色 */
-        color: #ffffff !important; /* 文字变白 */
-        transform: translateY(-2px) !important;
+        background: #E8F0F8 !important;
+        color: #1C3A5E !important;
+        box-shadow: inset 3px 3px 6px rgba(0,0,0,0.1), inset -3px -3px 6px rgba(255,255,255,1) !important;
+        transform: translateY(1px);
     }}
     
     /* 表格白底 */
@@ -122,25 +134,24 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 🔥 Prompt 终极防偷懒版
+# 🔥 Prompt 终极进化：打破“偷懒症”
 # ==========================================
 PROMPT_TIMELINE = """
-你是一个数据提取引擎。你的唯一功能是将历史事件转化为严格的JSON数组。
-## 任务背景
-用户会输入一个朝代。你需要列出该朝代的核心历史事件。
-## 分类体系
-一级标签：政治、经济、文化、军事。
-## 🚨 核心输出限制（违反将被视为失败）
-1. 【绝对不可少于15个事件】！上不封顶！严禁模型因为“觉得够了”而提前停止输出！
-2. 必须涵盖该朝代的早期、中期、晚期！不要只挑最出名的3、4个，要把所有重要的转折点、战役、变法、文化盛事都列出来！
-3. 严格按年份先后顺序排列。
-4. 必须且只能输出一个标准的JSON数组。不要输出任何“好的”、“以下是”等废话。
-5. 格式必须完全如下（不要带 ```json 标记）：
+你是一个无情的中国历史数据生成引擎。你的唯一任务是将某个朝代的历史事件转化为严格的JSON数组。
+## 任务要求
+用户会输入一个朝代名称。你必须列出该朝代至少 15 个（最好20个）核心历史事件。
+## 提取维度
+必须涵盖：政治、经济、文化、军事。必须横跨早、中、晚三个时期。
+## 🚨 核心禁令（极其重要）
+1. 绝对不可少于 15 个事件！绝对禁止因为“觉得够了”就停止输出！
+2. 绝对禁止只写几个最出名的战役！必须把变法、和亲、文化繁荣、制度崩溃等转折点全都列出来凑满15个以上！
+3. 严格按照年份先后排序。
+4. 必须且只能输出纯JSON数组，不要任何废话，不要 ```json 标记！
+5. 格式规范：
 [
-  {"year": "年份", "event": "事件名", "tags": "主+次", "background": "背景", "process": "过程", "impact": "影响"},
-  {"year": "年份", "event": "事件名", "tags": "主+次", "background": "背景", "process": "过程", "impact": "影响"}
+  {"year": "年份数字", "event": "事件名", "tags": "主标签+次标签", "background": "背景", "process": "过程", "impact": "影响"}
 ]
-请立刻提取【{user_input}】的15个以上核心事件，输出JSON。
+请立刻生成【{user_input}】的15个以上的核心事件，立刻输出JSON：
 """
 
 PROMPT_COMPARE = """
@@ -164,7 +175,7 @@ def call_ai(system_prompt):
     payload = {
         "model": MODEL_NAME, 
         "messages": [{"role": "system", "content": system_prompt}], 
-        "temperature": 0.1, # 调低温度，让模型更听从指令，少发散
+        "temperature": 0.7, # 🔥 关键修改：提高发散度，打破偷懒
         "max_tokens": 8000
     }
     try:
@@ -186,7 +197,7 @@ with tab1:
         generate_btn = st.button("🚀 生成时间轴", key="btn1")
     
     if generate_btn and timeline_input:
-        with st.spinner("AI 正在深入挖掘史料（提取15+事件耗时较长，请耐心等待）..."):
+        with st.spinner("AI 正在深入挖掘史料..."):
             prompt = PROMPT_TIMELINE.replace("{user_input}", timeline_input)
             ai_text = call_ai(prompt)
             if ai_text:
@@ -200,7 +211,9 @@ with tab1:
                         e["year"] = str(int(year_num.group())) if year_num else "0"
                     events.sort(key=lambda x: int(x["year"]))
 
-                    # 如果有超过15个事件，页面依然自适应撑开
+                    if len(events) < 10:
+                        st.warning(f"⚠️ AI 依然只生成了 {len(events)} 个事件，您可以再次点击生成。")
+
                     header_html = f"""
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid rgba(210, 180, 140, 0.5); padding-bottom: 15px;">
                         <div style="font-size: 26px; font-weight: bold; color: #1C3A5E;">
@@ -254,13 +267,13 @@ with tab1:
                                 window.parent.postMessage({{ type: 'streamlit:setFrameHeight', height: height }}, '*');
                             }}
                             window.addEventListener('load', resizeIframe);
-                            setTimeout(resizeIframe, 1000); // 稍微多等一会，确保长列表完全渲染
+                            setTimeout(resizeIframe, 1000);
                         </script>
                     </body></html>
                     """
                     components.html(full_html, height=800, scrolling=False)
                 except Exception as e:
-                    st.warning(f"解析失败，可能是 AI 没按格式输出，请再点一次。")
+                    st.warning(f"解析失败，请再点一次。")
 
 with tab2:
     st.subheader("多源史料互证与考证")
