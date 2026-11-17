@@ -1,31 +1,20 @@
-import os
 import re
-import time
 import requests
 import streamlit as st
 import streamlit.components.v1 as components
 
-# =========================================
-# [改动6] Key 不再写死在源码里
-# =========================================
-API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
+# ============================================================
+# 1. 配置
+# ============================================================
+API_KEY = "sk-59f7ba787a4f46c7846157a043f463e9"
 API_URL = "https://api.deepseek.com/chat/completions"
-MODEL_NAME = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")   # 换模型只改环境变量
+MODEL_NAME = "deepseek-chat"
 
 st.set_page_config(page_title="时空经纬", layout="wide")
 
-if not API_KEY:
-    st.error(
-        "未检测到 DEEPSEEK_API_KEY 环境变量。请先执行：\n\n"
-        "    export DEEPSEEK_API_KEY=\"sk-xxx\"\n"
-        "    streamlit run app_修复版.py\n\n"
-        "（原来写死在代码里的那个 key 已经随公开仓库泄露，务必去后台删掉重建。）"
-    )
-    st.stop()
-
-# ==========================================
-# 素材库
-# ==========================================
+# ============================================================
+# 2. 素材库
+# ============================================================
 bg1 = "https://cdn.jsdelivr.net/gh/yuki-huang2026/historytimeline@main/qianli.png"
 bg2 = "https://cdn.jsdelivr.net/gh/yuki-huang2026/historytimeline@main/fuchun.png"
 bg3 = "https://cdn.jsdelivr.net/gh/yuki-huang2026/historytimeline@main/daolian.png"
@@ -34,9 +23,9 @@ node_icon_url = "https://cdn.jsdelivr.net/gh/yuki-huang2026/historytimeline@main
 backtop_url = "https://cdn.jsdelivr.net/gh/yuki-huang2026/historytimeline@main/backtop.png"
 search_url = "https://cdn.jsdelivr.net/gh/yuki-huang2026/historytimeline@main/search.png"
 
-# ==========================================
-# 全局 CSS（保持原样，内联渲染后仍然生效）
-# ==========================================
+# ============================================================
+# 3. 页面样式
+# ============================================================
 st.markdown('<div id="top"></div>', unsafe_allow_html=True)
 
 st.markdown(f"""
@@ -103,27 +92,9 @@ st.markdown(f"""
     .stMarkdown td {{ border-bottom: 1px solid rgba(0,0,0,0.05); padding: 12px; color: #333 !important; }}
 
     .global-backtop {{ position: fixed; bottom: 40px; right: 40px; z-index: 9999; width: 50px; height: 50px; cursor: pointer; opacity: 0.8; }}
-
-    /* [改动1] 时间轴卡片样式改走 class：内联渲染后由本页全局 CSS 控制，不受 iframe 隔离影响 */
-    .tl-wrap {{ font-family: 'KaiTi', '思源黑体', sans-serif; }}
-    .tl-title {{ font-size: 26px; font-weight: bold; color: #1C3A5E;
-                 border-bottom: 2px solid rgba(210,180,140,0.5); padding-bottom: 15px; margin-bottom: 30px; }}
-    .tl-row {{ display: flex; margin-bottom: 20px; align-items: flex-start; }}
-    .tl-year {{ width: 110px; text-align: right; padding-right: 20px; font-weight: bold;
-                color: #1C3A5E; font-size: 18px; padding-top: 15px; flex-shrink: 0; }}
-    .tl-axis {{ width: 30px; display: flex; flex-direction: column; align-items: center;
-                margin-right: 20px; flex-shrink: 0; }}
-    .tl-axis img {{ width: 26px; height: 26px; margin-top: 10px; z-index: 2; object-fit: contain; }}
-    .tl-axis .line {{ width: 2px; flex-grow: 1; background-color: rgba(150,150,150,0.4); min-height: 100px; }}
-    .tl-card {{ background: rgba(255,255,255,0.95); border-radius: 15px; padding: 20px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.05); flex-grow: 1; border: 1px solid rgba(255,255,255,1); }}
-    .tl-card .hd {{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }}
-    .tl-card .hd h3 {{ margin: 0; color: #1C3A5E; font-size: 22px; }}
-    .tl-card .body {{ font-size: 15px; color: #333; line-height: 1.8; }}
-    .tl-card .body b {{ color: #1C3A5E; }}
     </style>
 
-    <a href="#top"><img src="{backtop_url}" class="global-backtop" alt="回到顶部"></a>
+    <a href="#top"><img src="{backtop_url}" class="global-backtop" alt="Back to top"></a>
 """, unsafe_allow_html=True)
 
 st.markdown(f"""
@@ -133,132 +104,118 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-# ==========================================
-# [改动3/4/5] Prompt：格式铁律放 system，主题与条数放 user
-# ==========================================
-SYS_TIMELINE = """你是一个历史数据提取引擎，只输出数据行，不输出任何解释、标题、序号、代码块。
-输出格式（每行一个事件，6 个字段用竖线 | 分隔）：
+# ============================================================
+# 4. 提示词：system 定规则，user 给任务
+# ============================================================
+SYSTEM_TIMELINE = """你是历史数据提取引擎。只输出数据行，禁止输出任何解释、序号、标题、前言、代码块。
+
+每行一个事件，6 个字段用竖线分隔：
 年份|事件名称|分类|背景|过程|影响
-硬性约束：
-1. 年份用数字；公元前写"公元前221"这种形式。
-2. 分类只能从 政治 / 经济 / 文化 / 军事 中组合（如"政治+军事"）。
-3. 背景、过程、影响各不超过 25 字，务必简短，把篇幅留给事件条数。
-4. 必须输出指定条数，不允许少于要求；不要编造，不确定的事件宁可换成确实存在的史实。
-"""
 
-USER_TIMELINE_TMPL = """主题：{topic}
-需要覆盖的时间阶段：{stage_desc}
-请输出 {count} 个该阶段的核心历史事件，涵盖政治、经济、文化、军事。
-直接输出 {count} 行数据，每行 6 个字段用竖线分隔。"""
+硬性规则：
+1. 年份写数字；公元前写成"前221"这种形式。
+2. 分类只能取自 政治 / 经济 / 文化 / 军事，可用 + 组合。
+3. 背景、过程、影响每项不超过 25 字，必须写实质内容，禁止写"暂无"。
+4. 事件必须真实存在，时间要均匀覆盖指定阶段的早期、中期、晚期。
+5. 上面那行字段名只是格式说明，绝对不要把它写进答案，直接从第一条数据开始输出。"""
 
-# 三段划分：把一次"要 20 条"的压力拆成三次"要 8 条"
-STAGES = [
-    ("前期", "该时期的建立/兴起阶段，直到第一个重大转折为止"),
-    ("中期", "该时期政权稳固后的发展阶段"),
-    ("后期", "该时期的衰落、危机与终结阶段"),
-]
-
-PROMPT_COMPARE_SYS = """你是一名极其严谨的历史史料对比研究助手。
-【防胡编乱造铁律】只引用真实存在的史书篇目；无法确认的写"存疑"。每条史料标注五级证据等级：
-一级(同时代一手出土/传世文献) 二级(当代官方史书) 三级(后代官修正史) 四级(私家笔记) 五级(后世演绎)。
-相互矛盾的记载必须并列呈现，不许自行调和。
-【输出格式】依次给出两个 Markdown 表格：
-### 史料档案表
-| 史料名称 | 成书年代 | 证据等级 | 相关篇目 | 核心记载 |
-### 逐维度对比表
-| 对比维度 | 记载A | 记载B | 差异性质 | 可信度判断 |
-只输出表格与必要的简短结论，不要开场白。"""
-
-PROMPT_HYPOTHESIS_SYS = """你是一名严谨的历史学专家，进行客观的反事实推演。
-必须基于真实史实，不许编造史实来支撑推演；每个推断注明依赖的条件与不确定性。
+SYSTEM_COMPARE = """你是严谨的历史史料对比研究助手。
+【防胡编铁律】只引用真实存在的史料，不确定的一律标注"存疑"；记载冲突时并列呈现不同说法，不得强行调和。
+每条史料标注五级证据等级：一手实物 / 一手文献 / 二手研究 / 后世追述 / 传说存疑。
 【输出格式】
-一、事实基线与偏离点（约150字）
-二、多情景逻辑推演（分短期10年内 / 中期数十年 / 长期百年以上）
-三、逻辑边界与免责声明（约100字）
-直接输出内容，不要开场白。"""
+## 史料档案表
+Markdown 表格，列：史料名称|成书年代|作者或来源|证据等级|核心记载|可信度说明
+## 逐维度对比表
+Markdown 表格，列：对比维度|说法A|说法B|学界倾向
+## 结论
+3 条要点。直接输出结果，不要寒暄。"""
+
+SYSTEM_HYPOTHESIS = """你是严谨的历史学专家，请围绕用户提出的假设做客观的反事实推演，推理要有史料与逻辑支撑，不得虚构史实作为前提。
+【输出格式】
+## 一、事实基线与偏离点（约150字）
+## 二、多情景逻辑推演（分短期1-5年、中期10-50年、长期百年以上）
+## 三、逻辑边界与免责声明（约100字）
+直接输出结果，不要寒暄。"""
 
 
-# =========================================
-# [改动7] 请求层：限流与失败分开处理
-# =========================================
-def call_ai(system_prompt, user_prompt, max_tokens=8000, retries=2):
-    headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
+def user_timeline(topic, stage, count):
+    return "主题：%s\n目标阶段：%s\n请输出 %d 条属于%s（%s）的核心历史事件，兼顾政治、经济、文化、军事。" % (
+        topic, stage, count, topic, stage)
+
+# ============================================================
+# 5. 调用大模型
+# ============================================================
+def call_ai(system_prompt, user_prompt, max_tokens=3000):
+    headers = {"Authorization": "Bearer " + API_KEY, "Content-Type": "application/json"}
     payload = {
         "model": MODEL_NAME,
         "messages": [
-            {"role": "system", "content": system_prompt},   # [改动3] 不再只有 system
+            {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ],
-        "temperature": 0.6,
+        "temperature": 0.4,
         "max_tokens": max_tokens,
     }
-    for attempt in range(retries + 1):
-        try:
-            resp = requests.post(API_URL, headers=headers, json=payload, timeout=180)
-            if resp.status_code == 429:                      # [改动7] 限额/限流单独提示
-                if attempt < retries:
-                    time.sleep(3 * (attempt + 1))
-                    continue
-                st.warning("⚠️ DeepSeek 触发限流(429)。这是平台配额限制，稍等十几秒重试即可；"
-                           "若持续出现，说明本月额度已用完，需充值或更换模型。")
-                return None
-            resp.raise_for_status()
-            return resp.json()["choices"][0]["message"]["content"]
-        except requests.exceptions.RequestException as e:
-            if attempt < retries:
-                time.sleep(2)
-                continue
-            st.error(f"AI 请求失败: {e}")
+    try:
+        resp = requests.post(API_URL, headers=headers, json=payload, timeout=180)
+        if resp.status_code == 429:
+            st.warning("接口触发限流（HTTP 429），请等待 30 秒后再点一次按钮。")
             return None
-    return None
+        if resp.status_code == 402:
+            st.error("账户余额不足（HTTP 402），请到 DeepSeek 开放平台充值后重试。")
+            return None
+        resp.raise_for_status()
+        return resp.json()["choices"][0]["message"]["content"]
+    except Exception as e:
+        st.error("AI 请求失败：%s" % e)
+        return None
 
-
-# =========================================
-# [改动2] 解析层：过滤污染行 + 公元前负数排序 + 去重
-# =========================================
-def parse_events(raw_text):
-    if not raw_text:
-        return []
-    events, seen = [], set()
-    for line in raw_text.splitlines():
+# ============================================================
+# 6. 解析竖线文本：剔除表头行 / 分隔行 / 加粗符号
+# ============================================================
+def parse_events(text):
+    events = []
+    for raw in text.splitlines():
+        line = raw.strip().strip("|").replace("**", "").replace(chr(96), "")
         if "|" not in line:
             continue
-        # 兼容 "| 618 | 李渊建唐 | ... |" 这种 Markdown 表格写法
-        cells = [c.strip() for c in line.strip().strip("|").split("|")]
-        cells = [c for c in cells if c != ""]      # 丢空列，避免字段整体右移一列
-        if len(cells) < 6:
+        if set(line) <= set("-:| "):
             continue
-        head, fields = cells[0], cells[1:7]
-        if re.fullmatch(r"[:\-\s]+", head):         # 分隔行 |---|---|
+        parts = [p.strip() for p in line.split("|") if p.strip()]
+        if len(parts) < 6:
             continue
-        if not re.search(r"\d", head):              # 表头行"年份|事件名称|..."
+        head = parts[0]
+        if any(w in head for w in ("年份", "年代", "时间", "Year", "year")):
             continue
-        m = re.search(r"\d+", head)
+        m = re.search(r"(\d+)", head)
         if not m:
             continue
-        num = int(m.group())
-        is_bc = bool(re.search(r"(前|BCE|BC)", head, re.IGNORECASE))
-        year_label = f"公元前{num}" if is_bc else str(num)
-        key = (year_label, fields[0])
-        if key in seen:                             # 三段结果合并去重
-            continue
-        seen.add(key)
+        num = int(m.group(1))
+        is_bc = ("前" in head) or bool(re.search(r"(?i)(bce|bc)", head))
+        if is_bc:
+            num = -num
+        year_text = ("公元前%d" % abs(num)) if is_bc else str(num)
         events.append({
-            "year": year_label,
-            "_k": -num if is_bc else num,
-            "event": fields[0],
-            "tags": fields[1],
-            "background": fields[2],
-            "process": fields[3],
-            "impact": fields[4],
+            "sort_key": num,
+            "year_text": year_text,
+            "event": parts[1],
+            "tags": parts[2],
+            "background": parts[3],
+            "process": parts[4],
+            "impact": parts[5],
         })
-    events.sort(key=lambda x: x["_k"])              # 公元前排在前，不会插到唐朝后面
     return events
 
 
-# =========================================
-# 导航（3D 按钮，逻辑不变）
-# =========================================
+def merge_events(items):
+    merged = {}
+    for ev in items:
+        merged.setdefault((ev["sort_key"], ev["event"]), ev)
+    return sorted(merged.values(), key=lambda x: x["sort_key"])
+
+# ============================================================
+# 7. 导航
+# ============================================================
 if "tab" not in st.session_state:
     st.session_state.tab = "time"
 
@@ -275,94 +232,106 @@ with col3:
 
 st.markdown("<hr style='border: 1px solid rgba(255,255,255,0.5); margin-bottom: 30px;'>", unsafe_allow_html=True)
 
-# =========================================
-# 内容区
-# =========================================
+# ============================================================
+# 8. 内容区
+# ============================================================
 if st.session_state.tab == "time":
-    col1, col2 = st.columns([3, 1])
+    col1, col2, col3 = st.columns([3, 1.2, 1])
     with col1:
         timeline_input = st.text_input("请输入朝代或历史时期：", placeholder="如：唐朝、宋朝", key="in1")
     with col2:
-        st.write(""); st.write("")
+        per_stage = st.number_input("每阶段事件数", min_value=4, max_value=12, value=8, step=1, key="num1")
+    with col3:
+        st.write("")
+        st.write("")
         generate_btn = st.button("🚀 生成时间轴", key="btn1")
 
-    per_stage = st.slider("每阶段事件数（总数 = 3 × 该值）", 6, 12, 8, key="per_stage")
-
-    if generate_btn and timeline_input:
-        events = []
-        bar = st.progress(0.0, text="AI 正在分段提取...")
-        for i, (name, desc) in enumerate(STAGES, 1):
-            with st.spinner(f"提取【{name}】事件..."):
-                user_prompt = USER_TIMELINE_TMPL.format(topic=timeline_input, stage_desc=desc, count=per_stage)
-                txt = call_ai(SYS_TIMELINE, user_prompt)
-                got = parse_events(txt)
-                events.extend(got)
-                if not got:
-                    st.warning(f"【{name}】这一段没解析到数据，可能模型这次没按格式输出。")
-            bar.progress(i / len(STAGES), text=f"已完成 {i}/{len(STAGES)} 段，累计 {len(events)} 条")
-
-        # 跨段去重后再排序
-        uniq, seen2 = [], set()
-        for e in events:
-            k = (e["year"], e["event"])
-            if k not in seen2:
-                seen2.add(k)
-                uniq.append(e)
-        uniq.sort(key=lambda x: x["_k"])
-        events = uniq
-
-        if not events:
-            st.error("没解析到任何事件。大概率是限流或格式跑偏，请再点一次；"
-                     "若每次都是 0 条，把上面的报错信息截图发我。")
+    if generate_btn:
+        if not timeline_input.strip():
+            st.info("请先输入朝代或历史时期。")
         else:
-            st.success(f"✅ 成功提取 {len(events)} 个历史事件！")
-            if len(events) < per_stage:
-                st.info("提示：条数偏少通常是 token 配额或限流导致，可减少每阶段事件数，或换用更大配额的模型。")
+            topic = timeline_input.strip()
+            per = int(per_stage)
+            collected = []
+            with st.spinner("AI 正在分段提取 %s 的事件（前 / 中 / 晚期）..." % topic):
+                for stage in ("早期", "中期", "晚期"):
+                    text = call_ai(SYSTEM_TIMELINE, user_timeline(topic, stage, per))
+                    if text:
+                        collected.extend(parse_events(text))
 
-            html_items = ""
-            for e in events:
-                tags = e.get("tags", "") or "综合"
-                if "政治" in tags:
-                    tag_bg = "rgba(135, 180, 220, 0.9)"
-                elif "经济" in tags:
-                    tag_bg = "rgba(220, 160, 135, 0.9)"
-                else:
-                    tag_bg = "rgba(150, 180, 150, 0.9)"
-                html_items += f"""
-                <div class="tl-row">
-                    <div class="tl-year">{e['year']}年</div>
-                    <div class="tl-axis">
-                        <img src="{node_icon_url}" />
-                        <div class="line"></div>
-                    </div>
-                    <div class="tl-card">
-                        <div class="hd">
-                            <h3>{e['event']}</h3>
-                            <span style="background:{tag_bg}; color:white; padding:5px 14px; border-radius:20px; font-size:13px; font-weight:bold;">{tags}</span>
-                        </div>
-                        <div class="body">
-                            <div><b>【背景】</b> {e.get('background') or '暂无'}</div>
-                            <div><b>【过程】</b> {e.get('process') or '暂无'}</div>
-                            <div><b>【影响】</b> {e.get('impact') or '暂无'}</div>
-                        </div>
-                    </div>
-                </div>
-                """
+            events = merge_events(collected)
 
-            page_html = f"""
-            <div class="tl-wrap">
-                <div class="tl-title">{timeline_input} 历史大事记</div>
-                {html_items}
-            </div>
-            """
-            
+            if not events:
+                st.error("未能解析出事件。可能原因：接口限流，或模型未按格式输出。请重试一次。")
+            else:
+                st.success("✅ 成功提取 %d 个历史事件（去重后）" % len(events))
+
+                header_html = (
+                    '<div style="display:flex; justify-content:space-between; align-items:center;'
+                    ' margin-bottom:30px; border-bottom:2px solid rgba(210,180,140,0.5); padding-bottom:15px;">'
+                    '<div style="font-size:26px; font-weight:bold; color:#1C3A5E;">%s 历史大事记</div>'
+                    '<div style="font-size:14px; color:#666;">共 %d 条</div></div>' % (topic, len(events))
+                )
+
+                html_items = ""
+                for e in events:
+                    tags = e["tags"]
+                    if "政治" in tags:
+                        tag_bg = "rgba(135, 180, 220, 0.9)"
+                    elif "经济" in tags:
+                        tag_bg = "rgba(220, 160, 135, 0.9)"
+                    else:
+                        tag_bg = "rgba(150, 180, 150, 0.9)"
+
+                    html_items += f"""
+                    <div style="display:flex; margin-bottom:20px; align-items:flex-start;">
+                        <div style="width:110px; text-align:right; padding-right:20px; font-weight:bold;
+                                    color:#1C3A5E; font-size:18px; padding-top:15px;">{e['year_text']}年</div>
+                        <div style="width:30px; display:flex; flex-direction:column; align-items:center; margin-right:20px;">
+                            <img src="{node_icon_url}" style="width:26px; height:26px; margin-top:10px; z-index:2; object-fit:contain;" />
+                            <div style="width:2px; flex-grow:1; background-color:rgba(150,150,150,0.4); min-height:100px; z-index:1;"></div>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.95); border-radius:15px; padding:20px;
+                                    box-shadow:0 4px 15px rgba(0,0,0,0.05); flex-grow:1; border:1px solid rgba(255,255,255,1);">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                                <h3 style="margin:0; color:#1C3A5E; font-size:22px;">{e['event']}</h3>
+                                <span style="background:{tag_bg}; color:white; padding:5px 14px; border-radius:20px;
+                                             font-size:13px; font-weight:bold;">{tags}</span>
+                            </div>
+                            <div style="font-size:15px; color:#333; line-height:1.8;">
+                                <div><strong style="color:#1C3A5E;">【背景】</strong> {e['background']}</div>
+                                <div><strong style="color:#1C3A5E;">【过程】</strong> {e['process']}</div>
+                                <div><strong style="color:#1C3A5E;">【影响】</strong> {e['impact']}</div>
+                            </div>
+                        </div>
+                    </div>
+                    """
+
+                full_html = (
+                    '<!DOCTYPE html><html><head><meta charset="utf-8"></head>'
+                    '<body style="margin:0; padding:10px; font-family:KaiTi, sans-serif; background:transparent;">'
+                    + header_html + '<div style="max-width:100%; margin:0 auto;">' + html_items
+                    + "</div></body></html>"
+                )
+
+                # 关键：iframe 高度按卡片数动态计算。写死 800 会把第 4 条之后的卡片裁掉。
+                components.html(full_html, height=140 + 240 * len(events), scrolling=False)
+
+                with st.expander("查看解析结果（调试用）"):
+                    st.code("\n".join(
+                        "%s|%s|%s|%s|%s|%s" % (e["year_text"], e["event"], e["tags"],
+                                               e["background"], e["process"], e["impact"]) for e in events),
+                        language="text")
 
 elif st.session_state.tab == "compare":
     st.subheader("多源史料互证与考证")
     compare_input = st.text_input("请输入要对比的历史事件：", placeholder="如：玄武门之变", key="in2")
-    if st.button("⚖️ 开启史料对比", key="btn2") and compare_input:
-        with st.spinner("AI 正在翻阅古籍..."):
-            ai_text = call_ai(PROMPT_COMPARE_SYS, f"请对以下历史事件做多源史料深度对比：{compare_input}")
+    if st.button("⚖️ 开启史料对比", key="btn2"):
+        if not compare_input.strip():
+            st.info("请先输入要对比的历史事件。")
+        else:
+            with st.spinner("AI 正在翻阅古籍..."):
+                ai_text = call_ai(SYSTEM_COMPARE, "事件：%s" % compare_input.strip(), max_tokens=4000)
             if ai_text:
                 st.markdown("---")
                 st.markdown(ai_text)
@@ -370,9 +339,12 @@ elif st.session_state.tab == "compare":
 elif st.session_state.tab == "hypothesis":
     st.subheader("反事实逻辑沙盘")
     hypothesis_input = st.text_input("请输入你的历史假设：", placeholder="如：如果安禄山没有造反", key="in3")
-    if st.button("🔮 开启历史推演", key="btn3") and hypothesis_input:
-        with st.spinner("AI 正在推演..."):
-            ai_text = call_ai(PROMPT_HYPOTHESIS_SYS, f"我的历史假设是：{hypothesis_input}")
+    if st.button("🔮 开启历史推演", key="btn3"):
+        if not hypothesis_input.strip():
+            st.info("请先输入你的历史假设。")
+        else:
+            with st.spinner("AI 正在推演..."):
+                ai_text = call_ai(SYSTEM_HYPOTHESIS, "假设：%s" % hypothesis_input.strip(), max_tokens=4000)
             if ai_text:
                 st.markdown("---")
                 st.markdown(ai_text)
