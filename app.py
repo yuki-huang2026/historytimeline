@@ -91,6 +91,32 @@ st.markdown(f"""
     .stMarkdown th {{ background-color: #1C3A5E !important; color: white !important; padding: 12px; }}
     .stMarkdown td {{ border-bottom: 1px solid rgba(0,0,0,0.05); padding: 12px; color: #333 !important; }}
 
+    /* tab2 / tab3 正文白底：AI 输出的段落、列表、小标题、引用统一铺白卡片，
+       与 tab1 表格白底观感一致。tab1 的大标题是 h1、时间轴走 iframe，均不受影响。 */
+    .stMarkdown p, .stMarkdown ul, .stMarkdown ol, .stMarkdown blockquote,
+    .stMarkdown h2, .stMarkdown h3 {{
+        background-color: rgba(255, 255, 255, 0.95) !important;
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin: 0 0 8px 0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border: 1px solid rgba(255,255,255,1);
+        color: #333 !important;
+        line-height: 1.9;
+    }}
+    .stMarkdown h2, .stMarkdown h3 {{
+        color: #1C3A5E !important;
+        padding: 12px 18px;
+        border-left: 5px solid rgba(135, 180, 220, 0.9);
+    }}
+    .stMarkdown li {{ color: #333 !important; line-height: 1.9; margin-bottom: 4px; }}
+    .stMarkdown li::marker {{ color: #1C3A5E; }}
+    .stMarkdown strong {{ color: #1C3A5E !important; }}
+    /* 表格与正文卡片之间的间距收紧，整页拼起来更像一张完整的纸 */
+    .stMarkdown table {{ margin: 6px 0 14px 0 !important; }}
+    .stMarkdown code {{ background-color: rgba(255,255,255,0.95) !important; padding: 2px 6px; border-radius: 5px; }}
+
+
     .global-backtop {{ position: fixed; bottom: 40px; right: 40px; z-index: 9999; width: 50px; height: 50px; cursor: pointer; opacity: 0.8; }}
     </style>
 
